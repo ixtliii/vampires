@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vampire Garlic Heist 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="root"></div>
+<!-- libraries are bundled in vendor/ so the game also runs offline -->
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script type="importmap">{ "imports": { "three": "./vendor/three.webgpu.min.js", "three/addons/": "./vendor/addons/" } }</script>
+<script type="module" src="src/ui.js"></script>
+<!-- if the game fails to start, say why instead of showing a dark page -->
+<div id="boot-error" hidden style="position:fixed;inset:0;display:grid;place-items:center;padding:24px;font:16px/1.5 system-ui,sans-serif;color:#F6F1E7;background:#16132B">
+  <div style="max-width:620px">
+    <p style="font:700 24px system-ui,sans-serif;color:#F5D66B;margin:0 0 8px">The game couldn’t start</p>
+    <p style="margin:0 0 8px">Press <b>Cmd + Shift + R</b> (Mac) or <b>Ctrl + Shift + R</b> (Windows) to reload without the browser’s old copies. If that doesn’t help, close every game window, then start the game again with start-mac.command or start-windows.bat.</p>
+    <p style="margin:0;opacity:.7;font-size:13px">Details: <span id="boot-error-msg"></span></p>
+  </div>
+</div>
+<script>
+  (function () {
+    var shown = false;
+    function fail(msg) {
+      if (shown) return; shown = true;
+      document.getElementById('boot-error-msg').textContent = msg || 'nothing was drawn';
+      document.getElementById('boot-error').hidden = false;
+    }
+    window.addEventListener('error', function (e) { if (!window.__vgh) fail(e.message || (e.target && e.target.src ? 'could not load ' + e.target.src : 'a file failed to load')); }, true);
+    window.addEventListener('unhandledrejection', function (e) { if (!window.__vgh || !window.__vgh.bats) fail(String(e.reason && e.reason.message || e.reason)); });
+    setTimeout(function () { if (!document.querySelector('#root .overlay, #root canvas')) fail('the game code did not run (try a hard reload)'); }, 8000);
+  })();
+</script>
+</body>
+</html>
