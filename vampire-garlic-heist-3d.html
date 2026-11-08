@@ -2,13 +2,13 @@
 <title>Vampire Garlic Heist 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: full-window 3D canvas (the projected wall); React draws HUD and screens on top */
 :root{
   --night:#16132B; --panel:#241F4A; --panel-2:#2E2860;
   --lavender:#C9B8F5; --garlic:#F5D66B; --cream:#F6F1E7; --soft:#DCD3F5; --coral:#F07A6A; --mint:#9FE0C9; --teal:#7FD6E0;
-  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --display:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;
   --body:'Nunito Sans','Segoe UI',system-ui,sans-serif;
   color-scheme:dark;
 }
@@ -201,6 +201,170 @@ const TREES = [[-15.3, -6.8], [-15.3, 6.8], [-11.0, 7.9], [3.85, 8.0],
   [9.2, -7.5], [9.2, 7.5], [-4.4, -3.4], [-0.4, -3.5], [-3.2, 3.6]];
 const GRAVEYARD = { x: 1.6, z: -7.0, w: 3.2, d: 2.2 };
 const STALLS = [{ x: -1.2, z: -1.65, color: '#F07A6A' }, { x: -2.8, z: 1.65, color: '#7FD6E0' }];
+
+// ----- src/i18n.js -----
+// =====================================================================
+// Vampire Garlic Heist: translations (English, Dutch, Russian).
+// t('key', { n: 3 }) fills in {n}; plural('bulbs', n) picks the right word form.
+// To add a language: add it to LANGS and give it a full set of strings below.
+// =====================================================================
+const LANGS = [
+  { id: 'en', label: 'English' },
+  { id: 'nl', label: 'Nederlands' },
+  { id: 'ru', label: 'Русский' }
+];
+
+const S = {
+  en: {
+    eyebrow: 'Play-test prototype · 3D', title1: 'Vampire ', title2: 'Garlic Heist',
+    lede: 'The village hung garlic everywhere to keep vampires out. You are the vampires. Steal every bulb and burn it in the castle furnace before the sun comes up.',
+    wakeT: 'Wake', wakeD: 'Each player wakes a sleeping bat on the castle wall.',
+    grabT: 'Grab & burn', grabD: 'Hover over garlic for 2 seconds, then fly it into the furnace. Garlic is heavy: you fly slower. Every extra bat adds 3 garlic.',
+    watchT: 'Watchmen', watchD: 'Each bat has 3 lives. Getting caught in a lantern’s light while carrying garlic costs a life and makes you drop it. Fly close with garlic and they chase you.',
+    lampsT: 'Lamps & the cat', lampsD: 'Street lamps switch on and off; their light slows your bat down. The cat meows if you fly too close, calling a watchman over.',
+    thPlayer: 'Player', thWake: 'Wake up', thFly: 'Fly', thEcho: 'Echolocate',
+    click: 'Click', moveMouse: 'Move the mouse', rightClickOr: 'Right-click or', keySpace: 'Space', arrowKeys: 'Arrow keys',
+    pad: 'Joy-Con / gamepad', anyButton: 'Any button', stick: 'Stick', faceButton: 'Any face button',
+    note: 'Echolocation sends sound waves to the garlic closest to your bat and marks it with an arrow (sometimes a hidden golden one, worth 3). The echo meter above your bat fills up and glows when you can use it again. Lose all 3 lives and your bat is out for the night. Bats still outside the castle at sunrise turn to dust. A bat that sits still for 25 seconds goes back to sleep.',
+    escBack: 'returns here.',
+    roundLength: 'Round length', min3: '3 min', sec90: '90 sec', sound: 'Sound', on: 'On', off: 'Off', language: 'Language',
+    start: 'Start the night', loading: 'Loading the village…', orPress: 'or press', orPad: 'or any controller button', renderer: 'Renderer', preparing: 'Preparing 3D renderer',
+    noRenderer: 'This browser could not start the 3D renderer. Try a recent Chrome or Edge with hardware acceleration on.',
+    canvasLabel: 'Vampire Garlic Heist: a 3D village at night',
+    winEyebrow: 'Total win', caughtEyebrow: 'Every bat got caught', sunEyebrow: 'The sun came up',
+    winTitle: 'The village is defenceless!', loseTitle: 'The village survives… for now',
+    winQuote: '“You burned {n} {bulbs}! The village is defenceless… mwahaha!”',
+    loseQuote: '“You burned {n} {bulbs} before sunrise. Next night, the village falls!”',
+    statBurned: 'Garlic bulbs burned', statGolden: 'Golden garlic found', statCaught: 'Times caught in the light', statDust: 'Bats turned to dust',
+    newBest: 'New best heist on this computer!', best: 'Best heist on this computer: {n} bulbs burned.',
+    again: 'Play again', backMenu: 'Back to menu',
+    garlicLeft: '{n} garlic left', burned: 'Burned {n}', sunriseIn: 'Sunrise in {t}', notStarted: 'Night has not started',
+    hintAsleep: 'All bats are asleep. Click, press WASD or arrows, or a controller button to wake one.',
+    hintStart: 'Click, press WASD or arrows, or a controller button. The sunrise timer starts with the first bat.',
+    chipEchoReady: 'echo ready', chipEcho: 'echo {n}s', chipOut: 'out', chipAsleep: 'asleep', chipGarlic: 'garlic', livesLabel: '{n} lives',
+    tagSleep: 'zzz {name}', tagOut: '{name} · out', tagEchoReady: 'Echo ready', tagEcho: 'Echo {n}s',
+    bats: ['Mouse', 'Keys 1', 'Keys 2', 'Pad 1', 'Pad 2', 'Pad 3', 'Pad 4'],
+    wakeToBegin: 'Wake up a bat to begin!', padConnected: 'Controller {n} connected: press a button to wake a bat',
+    yawn: 'yaaawn~', stealBefore: 'Steal the garlic before sunrise!', moreGarlic: 'More bats, bigger heist: +{n} garlic!',
+    lifeLost: '−1 ♥  ({n} left)', isOut: '{name} is out!', echoReady: 'echo ready!', hey: 'Hey!', slow: 'slooow…', thief: 'Thief!',
+    yuck: 'yuck!', golden: '+3 golden!', whoosh: 'whoosh! +1', nightShift: 'The night shift starts: another watchman!',
+    rooster: 'Cock-a-doodle-doo! Back to the castle!', allGone: 'All the garlic is gone! Hold on…', mwahaha: 'MWAHAHA!',
+    allCaught: 'Every bat got caught!', meow: 'Meow!', sunPoof: 'The sun is up! Poof…', sunSafe: 'The sun is up! Everyone made it to the castle.',
+    bulbs: ['garlic bulb', 'garlic bulbs']
+  },
+  nl: {
+    eyebrow: 'Speeltest-prototype · 3D', title1: 'Vampier ', title2: 'Knoflookroof',
+    lede: 'Het dorp heeft overal knoflook opgehangen om vampiers buiten te houden. Maar jullie zijn de vampiers! Steel elke bol en verbrand hem in de oven van het kasteel voordat de zon opkomt.',
+    wakeT: 'Wakker worden', wakeD: 'Elke speler maakt een slapende vleermuis op de kasteelmuur wakker.',
+    grabT: 'Pakken & verbranden', grabD: 'Hang 2 seconden boven een knoflook en vlieg hem dan naar de oven. Knoflook is zwaar: je vliegt trager. Elke extra vleermuis brengt 3 knoflookbollen meer.',
+    watchT: 'Nachtwakers', watchD: 'Elke vleermuis heeft 3 levens. Word je met knoflook in het licht van een lantaarn betrapt, dan verlies je een leven en laat je de knoflook vallen. Vlieg je met knoflook te dichtbij, dan zitten ze je achterna.',
+    lampsT: 'Lantaarns & de kat', lampsD: 'Straatlantaarns gaan aan en uit; in hun licht vliegt je vleermuis trager. De kat miauwt als je te dichtbij vliegt en roept zo een nachtwaker.',
+    thPlayer: 'Speler', thWake: 'Wakker maken', thFly: 'Vliegen', thEcho: 'Echolocatie',
+    click: 'Klikken', moveMouse: 'Beweeg de muis', rightClickOr: 'Rechtsklik of', keySpace: 'Spatie', arrowKeys: 'Pijltjestoetsen',
+    pad: 'Joy-Con / gamepad', anyButton: 'Elke knop', stick: 'Stick', faceButton: 'Een van de vier knoppen',
+    note: 'Echolocatie stuurt geluidsgolven naar de knoflook die het dichtst bij je vleermuis is en zet er een pijl boven (soms is het een verstopte gouden, die 3 punten waard is). De echometer boven je vleermuis loopt vol en gloeit zodra je hem weer kunt gebruiken. Ben je alle 3 levens kwijt, dan ligt je vleermuis eruit voor de rest van de nacht. Vleermuizen die bij zonsopgang nog buiten het kasteel zijn, vergaan tot stof. Een vleermuis die 25 seconden stilzit, valt weer in slaap.',
+    escBack: 'brengt je hier terug.',
+    roundLength: 'Duur van een ronde', min3: '3 min', sec90: '90 sec', sound: 'Geluid', on: 'Aan', off: 'Uit', language: 'Taal',
+    start: 'Begin de nacht', loading: 'Het dorp wordt geladen…', orPress: 'of druk op', orPad: 'of op een knop van een controller', renderer: 'Weergave', preparing: '3D-weergave wordt voorbereid',
+    noRenderer: 'Deze browser kon de 3D-weergave niet starten. Probeer een recente versie van Chrome of Edge met hardwareversnelling aan.',
+    canvasLabel: 'Vampier Knoflookroof: een 3D-dorp bij nacht',
+    winEyebrow: 'Totale overwinning', caughtEyebrow: 'Alle vleermuizen zijn betrapt', sunEyebrow: 'De zon is op',
+    winTitle: 'Het dorp is weerloos!', loseTitle: 'Het dorp houdt stand… voorlopig',
+    winQuote: '“Jullie hebben {n} {bulbs} verbrand! Het dorp is weerloos… mwahaha!”',
+    loseQuote: '“Jullie hebben {n} {bulbs} verbrand voor zonsopgang. Volgende nacht valt het dorp!”',
+    statBurned: 'Knoflookbollen verbrand', statGolden: 'Gouden knoflook gevonden', statCaught: 'Keer betrapt in het licht', statDust: 'Vleermuizen tot stof vergaan',
+    newBest: 'Nieuw record op deze computer!', best: 'Beste roof op deze computer: {n} bollen verbrand.',
+    again: 'Nog een keer', backMenu: 'Terug naar het menu',
+    garlicLeft: 'Nog {n} knoflook', burned: 'Verbrand: {n}', sunriseIn: 'Zonsopgang over {t}', notStarted: 'De nacht is nog niet begonnen',
+    hintAsleep: 'Alle vleermuizen slapen. Klik, druk op WASD of de pijltjes, of op een knop van een controller om er een wakker te maken.',
+    hintStart: 'Klik, druk op WASD of de pijltjes, of op een knop van een controller. De tijd tot zonsopgang begint te lopen bij de eerste vleermuis.',
+    chipEchoReady: 'echo klaar', chipEcho: 'echo {n}s', chipOut: 'eruit', chipAsleep: 'slaapt', chipGarlic: 'knoflook', livesLabel: '{n} levens',
+    tagSleep: 'zzz {name}', tagOut: '{name} · eruit', tagEchoReady: 'Echo klaar', tagEcho: 'Echo {n}s',
+    bats: ['Muis', 'Toetsen 1', 'Toetsen 2', 'Pad 1', 'Pad 2', 'Pad 3', 'Pad 4'],
+    wakeToBegin: 'Maak een vleermuis wakker om te beginnen!', padConnected: 'Controller {n} verbonden: druk op een knop om een vleermuis wakker te maken',
+    yawn: 'geeeeuw~', stealBefore: 'Steel de knoflook voor zonsopgang!', moreGarlic: 'Meer vleermuizen, grotere roof: +{n} knoflook!',
+    lifeLost: '−1 ♥  (nog {n})', isOut: '{name} ligt eruit!', echoReady: 'echo klaar!', hey: 'Hé!', slow: 'traaaag…', thief: 'Dief!',
+    yuck: 'bah!', golden: '+3 goud!', whoosh: 'woesj! +1', nightShift: 'De nachtploeg begint: nog een nachtwaker!',
+    rooster: 'Kukeleku! Terug naar het kasteel!', allGone: 'Alle knoflook is weg! Even volhouden…', mwahaha: 'MWAHAHA!',
+    allCaught: 'Alle vleermuizen zijn betrapt!', meow: 'Miauw!', sunPoof: 'De zon is op! Poef…', sunSafe: 'De zon is op! Iedereen is veilig in het kasteel.',
+    bulbs: ['knoflookbol', 'knoflookbollen']
+  },
+  ru: {
+    eyebrow: 'Прототип для тестирования · 3D', title1: 'Вампирский ', title2: 'чесночный налёт',
+    lede: 'Жители деревни развесили повсюду чеснок, чтобы отпугнуть вампиров. Но вампиры — это вы! Украдите каждую головку и сожгите её в печи замка, пока не взошло солнце.',
+    wakeT: 'Проснись', wakeD: 'Каждый игрок будит спящую летучую мышь на стене замка.',
+    grabT: 'Хватай и сжигай', grabD: 'Повисни над чесноком 2 секунды, а потом отнеси его в печь. Чеснок тяжёлый: с ним летишь медленнее. Каждая новая летучая мышь добавляет 3 головки чеснока.',
+    watchT: 'Сторожа', watchD: 'У каждой летучей мыши 3 жизни. Если с чесноком попадёшь в свет фонаря сторожа, ты теряешь жизнь и роняешь чеснок. Подлетишь к сторожу с чесноком — он погонится за тобой.',
+    lampsT: 'Фонари и кошка', lampsD: 'Уличные фонари то включаются, то гаснут, и в их свете летучая мышь летит медленнее. Если подлететь к кошке слишком близко, она мяукнет и позовёт сторожа.',
+    thPlayer: 'Игрок', thWake: 'Разбудить', thFly: 'Лететь', thEcho: 'Эхолокация',
+    click: 'Щелчок', moveMouse: 'Двигать мышью', rightClickOr: 'Правый щелчок или', keySpace: 'Пробел', arrowKeys: 'Стрелки',
+    pad: 'Joy-Con / геймпад', anyButton: 'Любая кнопка', stick: 'Стик', faceButton: 'Любая из четырёх кнопок',
+    note: 'Эхолокация посылает звуковые волны к ближайшему чесноку и отмечает его стрелкой (иногда это спрятанный золотой — он стоит 3). Шкала эха над летучей мышью заполняется и светится, когда эхо снова готово. Потеряешь все 3 жизни — летучая мышь выбывает до конца ночи. Летучие мыши, которые на рассвете ещё не в замке, превращаются в пыль. Если 25 секунд ничего не делать, летучая мышь снова засыпает.',
+    escBack: '— вернуться сюда.',
+    roundLength: 'Длина раунда', min3: '3 мин', sec90: '90 сек', sound: 'Звук', on: 'Вкл', off: 'Выкл', language: 'Язык',
+    start: 'Начать ночь', loading: 'Загружаем деревню…', orPress: 'или нажми', orPad: 'или любую кнопку контроллера', renderer: 'Графика', preparing: 'Готовим 3D-графику',
+    noRenderer: 'Этот браузер не смог запустить 3D-графику. Попробуйте свежую версию Chrome или Edge с включённым аппаратным ускорением.',
+    canvasLabel: 'Вампирский чесночный налёт: 3D-деревня ночью',
+    winEyebrow: 'Полная победа', caughtEyebrow: 'Все летучие мыши пойманы', sunEyebrow: 'Взошло солнце',
+    winTitle: 'Деревня беззащитна!', loseTitle: 'Деревня устояла… пока что',
+    winQuote: '«Вы сожгли {n} {bulbs}! Деревня беззащитна… муа-ха-ха!»',
+    loseQuote: '«Вы сожгли {n} {bulbs} до рассвета. Следующей ночью деревня падёт!»',
+    statBurned: 'Сожжено головок чеснока', statGolden: 'Найдено золотого чеснока', statCaught: 'Раз пойманы светом', statDust: 'Летучих мышей превратилось в пыль',
+    newBest: 'Новый рекорд на этом компьютере!', best: 'Рекорд на этом компьютере: сожжено головок — {n}.',
+    again: 'Ещё раз', backMenu: 'В меню',
+    garlicLeft: 'Осталось чеснока: {n}', burned: 'Сожжено: {n}', sunriseIn: 'Рассвет через {t}', notStarted: 'Ночь ещё не началась',
+    hintAsleep: 'Все летучие мыши спят. Щёлкни, нажми WASD, стрелки или кнопку контроллера, чтобы разбудить одну.',
+    hintStart: 'Щёлкни, нажми WASD, стрелки или кнопку контроллера. Отсчёт до рассвета начнётся с первой летучей мыши.',
+    chipEchoReady: 'эхо готово', chipEcho: 'эхо {n} с', chipOut: 'выбыла', chipAsleep: 'спит', chipGarlic: 'с чесноком', livesLabel: 'жизней: {n}',
+    tagSleep: 'zzz {name}', tagOut: '{name} · выбыла', tagEchoReady: 'Эхо готово', tagEcho: 'Эхо {n} с',
+    bats: ['Курсор', 'Клавиши 1', 'Клавиши 2', 'Геймпад 1', 'Геймпад 2', 'Геймпад 3', 'Геймпад 4'],
+    wakeToBegin: 'Разбуди летучую мышь, чтобы начать!', padConnected: 'Контроллер {n} подключён: нажми кнопку, чтобы разбудить летучую мышь',
+    yawn: 'зева-а-а~', stealBefore: 'Укради чеснок до рассвета!', moreGarlic: 'Больше летучих мышей — больше добычи: +{n} чеснока!',
+    lifeLost: '−1 ♥  (осталось {n})', isOut: '{name} выбывает!', echoReady: 'эхо готово!', hey: 'Эй!', slow: 'ме-е-едленно…', thief: 'Вор!',
+    yuck: 'фу!', golden: '+3 золотой!', whoosh: 'вжух! +1', nightShift: 'Ночная смена: ещё один сторож!',
+    rooster: 'Кукареку! Назад в замок!', allGone: 'Весь чеснок украден! Держитесь…', mwahaha: 'МУА-ХА-ХА!',
+    allCaught: 'Все летучие мыши пойманы!', meow: 'Мяу!', sunPoof: 'Солнце взошло! Пуф…', sunSafe: 'Солнце взошло! Все успели в замок.',
+    bulbs: ['головку чеснока', 'головки чеснока', 'головок чеснока']
+  }
+};
+
+const KEY = 'vgh-lang';
+let lang = 'en';
+try {
+  const saved = localStorage.getItem(KEY);
+  const nav = (navigator.language || '').slice(0, 2);
+  lang = S[saved] ? saved : S[nav] ? nav : 'en';
+} catch (e) { /* storage blocked: keep English */ }
+const listeners = new Set();
+
+const getLang = () => lang;
+function setLang(l) {
+  if (!S[l]) return;
+  lang = l;
+  try { localStorage.setItem(KEY, l); } catch (e) { /* storage blocked */ }
+  document.documentElement.lang = l;
+  listeners.forEach(f => f(l));
+}
+const onLang = f => { listeners.add(f); return () => listeners.delete(f); };
+
+// word form for a count: English/Dutch have two, Russian three (1 головку, 2 головки, 5 головок)
+function plural(key, n) {
+  const forms = S[lang][key] || S.en[key];
+  if (lang === 'ru') {
+    const a = n % 10, b = n % 100;
+    return forms[a === 1 && b !== 11 ? 0 : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 1 : 2];
+  }
+  return forms[n === 1 ? 0 : 1];
+}
+function t(key, vars) {
+  let s = S[lang][key] ?? S.en[key] ?? key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  return s;
+}
+const batName = slot => (S[lang].bats || S.en.bats)[slot];
+document.documentElement.lang = lang;
+
+const tr = t; // game.js imports t as tr
 
 // ----- src/audio.js -----
 // =====================================================================
@@ -690,10 +854,10 @@ class Game {
     const bGlow = this.glowDisc(color, .8); bGlow.scale.setScalar(2.6); bGlow.position.y = .13;
     const beacon = new THREE.Group(); beacon.add(arrow); beacon.add(bRing); beacon.add(bGlow); beacon.visible = false; this.scene.add(beacon);
     const tag = document.createElement('div'); tag.className = 'tag';
-    tag.innerHTML = `<span class="nm" style="color:${color}">${BAT_NAMES[slot]}</span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span><span class="echo"><i></i><em>Echo</em></span><span class="grab" hidden></span>`;
+    tag.innerHTML = `<span class="nm" style="color:${color}"></span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span><span class="echo"><i></i><em>Echo</em></span><span class="grab" hidden></span>`;
     this.layer.appendChild(tag);
     const roof = slot < 3 ? { x: 11.9 + slot * 1.35, z: -8.1 } : { x: 11.9 + (slot - 3) * .95, z: 8.1 };
-    return { slot, color, name: BAT_NAMES[slot], state: 'sleep', x: roof.x, z: roof.z, vx: 0, vz: 0, roof, yaw: 0,
+    return { slot, color, get name() { return batName(slot); }, state: 'sleep', x: roof.x, z: roof.z, vx: 0, vz: 0, roof, yaw: 0,
       carrying: null, grabT: 0, grabSpot: null, stunT: 0, invulnT: 0, echo: null, echoCd: 0, idleT: 0, wakeT: 0, pulseT: 0, lives: LIVES,
       g, wingL, wingR, eyes, ring, carry, carryGold, beacon, arrow, bRing, bGlow, waves, inLamp: false, tag,
       tagNm: tag.querySelector('.nm'), tagHearts: [...tag.querySelectorAll('.hearts i')], tagEcho: tag.querySelector('.echo'), tagEchoTxt: tag.querySelector('.echo em'),
@@ -773,7 +937,7 @@ class Game {
     });
     window.addEventListener('keyup', e => this.keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
     window.addEventListener('blur', () => this.keys.clear());
-    window.addEventListener('gamepadconnected', e => { if (this.state === 'play') this.showBanner(`Controller ${e.gamepad.index + 1} connected: press a button to wake a bat`, 3, '#9FE0C9'); });
+    window.addEventListener('gamepadconnected', e => { if (this.state === 'play') this.showBanner(tr('padConnected', { n: e.gamepad.index + 1 }), 3, '#9FE0C9'); });
   }
   readPads() {
     let pads = [];
@@ -807,7 +971,7 @@ class Game {
   start() {
     this.sound.init(); this.sound.music = true; this.sound.step = 0; this.sound.next = this.sound.now() + .1;
     this.resetRound(); this.state = 'play';
-    this.showBanner('Wake up a bat to begin!', 999);
+    this.showBanner(tr('wakeToBegin'), 999);
     this.cb.onScreen('play');
   }
   toMenu() {
@@ -862,10 +1026,10 @@ class Game {
   wake(b) {
     if (this.state !== 'play' || b.state !== 'sleep' || b.lives <= 0) return;
     Object.assign(b, { state: 'active', wakeT: .8, idleT: 0, x: b.roof.x, z: b.roof.z + (b.roof.z < 0 ? 1 : -1), vx: 0, vz: 0, echoCd: 0, stunT: 0, invulnT: 0, inLamp: false });
-    this.addFloat(b.x, FLY_Y + .8, b.z, 'yaaawn~', b.color, 22);
+    this.addFloat(b.x, FLY_Y + .8, b.z, tr('yawn'), b.color, 22);
     this.burst(b.x, FLY_Y, b.z, 14, [b.color, '#F6F1E7'], 3);
     this.sound.play('yawn'); this.rumble(b, .25, .4, .2);
-    if (!this.started) { this.started = true; this.showBanner('Steal the garlic before sunrise!', 2.5); }
+    if (!this.started) { this.started = true; this.showBanner(tr('stealBefore'), 2.5); }
     const n = this.activeBats().length;
     if (n > this.maxActive) { if (n >= 2) this.moreGarlic(GARLIC_PER_EXTRA_BAT); this.maxActive = n; }
   }
@@ -873,7 +1037,7 @@ class Game {
     const normal = this.spots.filter(s => !s.golden);
     const empty = shuffle(normal.filter(s => s.count === 0)), full = shuffle(normal.filter(s => s.count > 0));
     empty.concat(full).slice(0, n).forEach(s => { s.count++; this.burst(s.x, .5, s.z, 10, ['#F5D66B', '#F6F1E7'], 2.5); });
-    this.showBanner(`More bats, bigger heist: +${n} garlic!`, 2.5, '#F5D66B'); this.sound.play('more');
+    this.showBanner(tr('moreGarlic', { n }), 2.5, '#F5D66B'); this.sound.play('more');
   }
   sleepBat(b, silent) {
     if (b.carrying) { this.flyBack(b.carrying, b.x, b.z, 1); b.carrying = null; }
@@ -907,9 +1071,9 @@ class Game {
     this.addFloat(src.x, 2.8, src.z, word, '#F07A6A', 32);
     this.burst(b.x, FLY_Y, b.z, 16, ['#F07A6A', '#FFE08A'], 4);
     this.sound.play('alarm'); this.rumble(b, .4, .8, 1);
-    if (b.lives > 0) { this.addFloat(b.x, FLY_Y + 1.2, b.z, `−1 ♥  (${b.lives} left)`, '#F07A6A', 22, 1.6); return; }
+    if (b.lives > 0) { this.addFloat(b.x, FLY_Y + 1.2, b.z, tr('lifeLost', { n: b.lives }), '#F07A6A', 22, 1.6); return; }
     // out of lives: the bat is out for the rest of the night
-    this.addFloat(b.x, FLY_Y + 1.2, b.z, `${b.name} is out!`, '#F07A6A', 26, 2);
+    this.addFloat(b.x, FLY_Y + 1.2, b.z, tr('isOut', { name: b.name }), '#F07A6A', 26, 2);
     this.burst(b.x, FLY_Y, b.z, 30, ['#BDB6CF', '#8E86A8', b.color], 3.5, 1.1, 1.4, 1.5);
     this.sound.play('puff'); this.rumble(b, .6, 1, 1);
     this.sleepBat(b, true); b.state = 'out';
@@ -945,7 +1109,7 @@ class Game {
     const w3 = this.watchmen[2];
     if (!w3.active && this.started && (this.activeBats().length >= 3 || p >= THIRD_WATCHMAN_AT)) {
       Object.assign(w3, { active: true, x: w3.path[0][0], z: w3.path[0][1], seg: 1, mode: 'patrol' });
-      if (!this.shiftDone) { this.shiftDone = true; this.showBanner('The night shift starts: another watchman!', 3, '#F07A6A'); this.sound.play('alarm'); }
+      if (!this.shiftDone) { this.shiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A'); this.sound.play('alarm'); }
     }
 
     this.updateWatchmen(dt, p, !this.started);
@@ -960,7 +1124,7 @@ class Game {
       if (b.state !== 'active') return;
       const wasCooling = b.echoCd > 0;
       b.wakeT = Math.max(0, b.wakeT - dt); b.echoCd = Math.max(0, b.echoCd - dt);
-      if (wasCooling && b.echoCd <= 0 && this.state === 'play') { this.addFloat(b.x, FLY_Y + 1.1, b.z, 'echo ready!', '#7FD6E0', 18, 1); this.sound.play('ready'); this.rumble(b, .08, .3, 0); } b.stunT = Math.max(0, b.stunT - dt); b.invulnT = Math.max(0, b.invulnT - dt);
+      if (wasCooling && b.echoCd <= 0 && this.state === 'play') { this.addFloat(b.x, FLY_Y + 1.1, b.z, tr('echoReady'), '#7FD6E0', 18, 1); this.sound.play('ready'); this.rumble(b, .08, .3, 0); } b.stunT = Math.max(0, b.stunT - dt); b.invulnT = Math.max(0, b.invulnT - dt);
       if (b.echo) { b.echo.t += dt; if (b.echo.t > ECHO_DUR || (b.echo.spot && b.echo.spot.count <= 0)) b.echo = null; }
       let dvx = 0, dvz = 0, input = false;
       const vmax = (b.carrying ? CARRY_V : MAXV) * (b.inLamp ? LAMP_SLOW : 1);
@@ -998,20 +1162,20 @@ class Game {
           near = true;
           if (b.carrying && b.invulnT <= 0 && w.mode !== 'chase' && w.alertT <= 0) {
             w.mode = 'chase'; w.chaseBat = b; w.chaseT = 2.4; w.pause = 0;
-            this.addFloat(w.x, 2.3, w.z, 'Hey!', '#F07A6A', 26); this.sound.play('hey');
+            this.addFloat(w.x, 2.3, w.z, tr('hey'), '#F07A6A', 26); this.sound.play('hey');
           }
         } else if (d < R + 2.6) near = true;
       });
       // street lamps
       // street lamps don't catch you, their light just slows you down
       const lamp = this.lamps.some(L => L.onNow && d2(b.x, b.z, L.x, L.z) < LAMP_R);
-      if (lamp && !b.inLamp) { this.addFloat(b.x, FLY_Y + 1, b.z, 'slooow…', '#FFE9A8', 20, 1); this.rumble(b, .2, .5, 0); }
+      if (lamp && !b.inLamp) { this.addFloat(b.x, FLY_Y + 1, b.z, tr('slow'), '#FFE9A8', 20, 1); this.rumble(b, .2, .5, 0); }
       b.inLamp = lamp;
       if (lamp && Math.random() < dt * 12) this.burst(b.x, FLY_Y, b.z, 1, ['#FFE9A8'], .6, .6, .7);
       if (lit || near) { b.pulseT -= dt; if (b.pulseT <= 0) { b.pulseT = .75; this.rumble(b, .09, .25, .35); } }
       // watchmen only catch a bat that is carrying garlic
       if (lit && b.carrying && b.stunT <= 0 && b.invulnT <= 0) {
-        this.caughtBat(b, lit, 'Thief!'); lit.alertT = 1.6; lit.pause = 1.2; lit.mode = 'return'; lit.chaseBat = null;
+        this.caughtBat(b, lit, tr('thief')); lit.alertT = 1.6; lit.pause = 1.2; lit.mode = 'return'; lit.chaseBat = null;
         if (b.state !== 'active') return;
       }
       if (lit) { b.grabT = 0; b.grabSpot = null; }
@@ -1023,14 +1187,14 @@ class Game {
           b.grabT += dt; if (best.golden) best.revealT = Math.max(best.revealT, .6);
           if (b.grabT >= GRAB_TIME) {
             best.count--; b.carrying = best; b.grabT = 0; b.grabSpot = null;
-            this.addFloat(b.x, FLY_Y + .9, b.z, 'yuck!', '#9FE0C9', 28); this.sound.play('yuck'); this.rumble(b, .15, .35, .6);
+            this.addFloat(b.x, FLY_Y + .9, b.z, tr('yuck'), '#9FE0C9', 28); this.sound.play('yuck'); this.rumble(b, .15, .35, .6);
           }
         } else { b.grabSpot = best; b.grabT = 0; }
       }
       // burn it
       if (b.carrying && d2(b.x, b.z, FURNACE.x, FURNACE.z) < FURNACE.r + .35) {
         const g = b.carrying.golden; b.carrying = null; this.burned++; if (g) this.goldenFound++;
-        this.addFloat(FURNACE.x, 3, FURNACE.z, g ? '+3 golden!' : 'whoosh! +1', g ? '#FFD84A' : '#F5D66B', 30);
+        this.addFloat(FURNACE.x, 3, FURNACE.z, g ? tr('golden') : tr('whoosh'), g ? '#FFD84A' : '#F5D66B', 30);
         this.burst(FURNACE.x, 1, FURNACE.z, 30, ['#F5D66B', '#F4B183', '#F07A6A', '#FFF3B0'], 5, 1, 1.4, 4);
         this.sound.play('whoosh'); this.rumble(b, .25, .6, .6);
       }
@@ -1039,16 +1203,16 @@ class Game {
     if (this.state === 'play' && this.started) {
       this.elapsed += dt;
       const pp = this.elapsed / this.roundTime;
-      if (pp >= .86 && !this.roosterDone) { this.roosterDone = true; this.sound.play('rooster'); this.showBanner('Cock-a-doodle-doo! Back to the castle!', 4, '#F4B183'); }
-      if (this.remaining() === 0) { this.state = 'countdown'; this.cdT = 3; this.lastCd = 4; this.showBanner('All the garlic is gone! Hold on…', 3, '#F5D66B'); }
+      if (pp >= .86 && !this.roosterDone) { this.roosterDone = true; this.sound.play('rooster'); this.showBanner(tr('rooster'), 4, '#F4B183'); }
+      if (this.remaining() === 0) { this.state = 'countdown'; this.cdT = 3; this.lastCd = 4; this.showBanner(tr('allGone'), 3, '#F5D66B'); }
       else if (pp >= 1) this.sunUp();
       else if (this.activeBats().length === 0 && this.bats.some(b => b.state === 'out')) { // the last bat in the air got caught
-        this.state = 'sunup'; this.cdT = 2; this.outEnd = true; this.showBanner('Every bat got caught!', 2, '#F07A6A');
+        this.state = 'sunup'; this.cdT = 2; this.outEnd = true; this.showBanner(tr('allCaught'), 2, '#F07A6A');
       }
     } else if (this.state === 'countdown') {
       this.cdT -= dt; const sc = Math.ceil(this.cdT);
       if (sc < this.lastCd && sc > 0) { this.lastCd = sc; this.sound.play('tick'); }
-      if (this.cdT <= 0) { this.state = 'boss'; this.bossT = 0; this.banner = null; this.sound.play('mwahaha'); this.addFloat(6, 5, 0, 'MWAHAHA!', '#F5D66B', 64, 3.4); }
+      if (this.cdT <= 0) { this.state = 'boss'; this.bossT = 0; this.banner = null; this.sound.play('mwahaha'); this.addFloat(6, 5, 0, tr('mwahaha'), '#F5D66B', 64, 3.4); }
     } else if (this.state === 'boss') {
       this.bossT += dt; if (this.bossT > 3.6) this.finish(true);
     } else if (this.state === 'sunup') {
@@ -1104,7 +1268,7 @@ class Game {
       if (b.state !== 'active') continue;
       if (d2(b.x, b.z, c.x, c.z) < (b.carrying ? 2.2 : 1.3)) {
         c.cd = 7; c.pause = 1.5;
-        this.addFloat(c.x, 1.3, c.z, 'Meow!', '#F4B183', 24); this.sound.play('meow');
+        this.addFloat(c.x, 1.3, c.z, tr('meow'), '#F4B183', 24); this.sound.play('meow');
         const w = this.nearestWatchman(c.x, c.z);
         if (w) { w.mode = 'investigate'; w.inv = { x: c.x, z: c.z }; w.pause = 0; this.addFloat(w.x, 2.3, w.z, '?', '#F07A6A', 34); }
         break;
@@ -1119,7 +1283,7 @@ class Game {
       if (b.x < CASTLE_X) { this.burst(b.x, FLY_Y, b.z, 34, ['#BDB6CF', '#8E86A8', '#F6F1E7'], 3.5, 1.2, 1.6, 1.5); this.dusted++; any = true; this.sleepBat(b, true); }
     });
     if (any) this.sound.play('puff');
-    this.showBanner(any ? 'The sun is up! Poof…' : 'The sun is up! Everyone made it to the castle.', 2.4, '#F4B183');
+    this.showBanner(any ? tr('sunPoof') : tr('sunSafe'), 2.4, '#F4B183');
   }
 
   // =================================================================
@@ -1222,10 +1386,10 @@ class Game {
       const [sx, sy] = this.toScreen(b.g.position.x, b.g.position.y + (sleeping ? .7 + (b.slot % 2) * .55 : .8), b.g.position.z);
       b.tag.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
       const cache = b.tagCache, out = b.state === 'out';
-      const nm = out ? `${b.name} · out` : sleeping ? `zzz ${b.name}` : b.name;
+      const nm = out ? tr('tagOut', { name: b.name }) : sleeping ? tr('tagSleep', { name: b.name }) : b.name;
       if (cache.nm !== nm) { cache.nm = nm; b.tagNm.textContent = nm; b.tag.classList.toggle('sleep', sleeping); b.tag.classList.toggle('out', out); }
       if (cache.lives !== b.lives) { cache.lives = b.lives; b.tagHearts.forEach((hEl, i) => hEl.classList.toggle('lost', i >= b.lives)); }
-      const ready = b.echoCd <= 0 && b.wakeT <= 0, echoTxt = sleeping ? '' : ready ? 'Echo ready' : `Echo ${Math.ceil(b.echoCd)}s`;
+      const ready = b.echoCd <= 0 && b.wakeT <= 0, echoTxt = sleeping ? '' : ready ? tr('tagEchoReady') : tr('tagEcho', { n: Math.ceil(b.echoCd) });
       if (cache.echo !== echoTxt) { cache.echo = echoTxt; b.tagEcho.hidden = sleeping; b.tagEchoTxt.textContent = echoTxt; b.tagEcho.classList.toggle('ready', ready); }
       if (!ready && !sleeping) b.tagEcho.style.setProperty('--p', (1 - b.echoCd / ECHO_CD).toFixed(3));
       const gp = b.grabT > 0 ? b.grabT / GRAB_TIME : 0;
@@ -1275,7 +1439,7 @@ class Game {
       banner: this.banner ? { text: this.banner.text, color: this.banner.color } : null,
       count: this.state === 'countdown' ? Math.max(1, Math.ceil(this.cdT)) : 0,
       awake: this.activeBats().length,
-      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ name: b.name, color: b.color, awake: b.state === 'active', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0 })),
+      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0 })),
       backend: this.backend
     };
   }
@@ -1284,6 +1448,7 @@ class Game {
 // ----- src/ui.js -----
 // =====================================================================
 // Vampire Garlic Heist: React UI (menu, HUD, score screen). React is loaded as a global from vendor/.
+// All text comes from i18n.js (English, Dutch, Russian).
 // =====================================================================
 
 const { useState, useEffect, useRef } = React;
@@ -1292,48 +1457,52 @@ const h = React.createElement;
 function Seg({ label, options, value, onChange }) {
   return h('div', { className: 'opt' }, label,
     h('span', { className: 'seg', role: 'group', 'aria-label': label },
-      options.map(o => h('button', { key: o.v, type: 'button', 'aria-pressed': String(value === o.v), onClick: () => onChange(o.v) }, o.label))));
+      options.map(o => h('button', { key: String(o.v), type: 'button', lang: o.lang, 'aria-pressed': String(value === o.v), onClick: () => onChange(o.v) }, o.label))));
 }
-const K = t => h('kbd', null, t);
+const K = x => h('kbd', null, x);
+const WASD = () => h(React.Fragment, null, K('W'), K('A'), K('S'), K('D'));
 
-function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, onStart }) {
+function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart }) {
   return h('div', { className: 'overlay' }, h('div', { className: 'card' },
-    h('p', { className: 'eyebrow' }, 'Play-test prototype · 3D'),
-    h('h1', null, 'Vampire ', h('span', null, 'Garlic Heist')),
-    h('p', { className: 'lede' }, 'The village hung garlic everywhere to keep vampires out. You are the vampires. Steal every bulb and burn it in the castle furnace before the sun comes up.'),
-    h('div', { className: 'steps' },
-      h('div', { className: 'step' }, h('b', null, 'Wake'), h('span', null, 'Each player wakes a sleeping bat on the castle wall.')),
-      h('div', { className: 'step' }, h('b', null, 'Grab & burn'), h('span', null, 'Hover over garlic for 2 seconds, then fly it into the furnace. Garlic is heavy: you fly slower. Every extra bat adds 3 garlic.')),
-      h('div', { className: 'step warn' }, h('b', null, 'Watchmen'), h('span', null, 'Each bat has 3 lives. Getting caught in a lantern’s light while carrying garlic costs a life and makes you drop it. Fly close with garlic and they chase you.')),
-      h('div', { className: 'step warn' }, h('b', null, 'Lamps & the cat'), h('span', null, 'Street lamps switch on and off; their light slows your bat down. The cat meows if you fly too close, calling a watchman over.'))),
-    h('div', { className: 'table-wrap' }, h('table', null,
-      h('thead', null, h('tr', null, ['Player', 'Wake up', 'Fly', 'Echolocate'].map(x => h('th', { key: x }, x)))),
-      h('tbody', null,
-        h('tr', null, h('td', null, 'Mouse'), h('td', null, 'Click'), h('td', null, 'Move the mouse'), h('td', null, 'Right-click or ', K('Space'))),
-        h('tr', null, h('td', null, 'Keys 1'), h('td', null, K('W'), K('A'), K('S'), K('D')), h('td', null, K('W'), K('A'), K('S'), K('D')), h('td', null, K('E'))),
-        h('tr', null, h('td', null, 'Keys 2'), h('td', null, 'Arrow keys'), h('td', null, 'Arrow keys'), h('td', null, K('Enter'))),
-        h('tr', null, h('td', null, 'Joy-Con / gamepad'), h('td', null, 'Any button'), h('td', null, 'Stick'), h('td', null, 'Any face button'))))),
-    h('p', { className: 'note' }, 'Echolocation sends sound waves to the garlic closest to your bat and marks it with an arrow (sometimes a hidden golden one, worth 3). The echo meter above your bat fills up and glows when you can use it again. Lose all 3 lives and your bat is out for the night. Bats still outside the castle at sunrise turn to dust. A bat that sits still for 25 seconds goes back to sleep. ', K('Esc'), ' returns here.'),
     h('div', { className: 'options' },
-      h(Seg, { label: 'Round length', value: roundTime, onChange: setRoundTime, options: [{ v: 180, label: '3 min' }, { v: 90, label: '90 sec' }] }),
-      h(Seg, { label: 'Sound', value: sound, onChange: setSound, options: [{ v: true, label: 'On' }, { v: false, label: 'Off' }] })),
-    error ? h('p', { className: 'note', style: { color: 'var(--coral)' } }, error) : null,
+      h(Seg, { label: t('language'), value: lang, onChange: changeLang, options: LANGS.map(l => ({ v: l.id, label: l.label, lang: l.id })) })),
+    h('p', { className: 'eyebrow' }, t('eyebrow')),
+    h('h1', null, t('title1'), h('span', null, t('title2'))),
+    h('p', { className: 'lede' }, t('lede')),
+    h('div', { className: 'steps' },
+      h('div', { className: 'step' }, h('b', null, t('wakeT')), h('span', null, t('wakeD'))),
+      h('div', { className: 'step' }, h('b', null, t('grabT')), h('span', null, t('grabD'))),
+      h('div', { className: 'step warn' }, h('b', null, t('watchT')), h('span', null, t('watchD'))),
+      h('div', { className: 'step warn' }, h('b', null, t('lampsT')), h('span', null, t('lampsD')))),
+    h('div', { className: 'table-wrap' }, h('table', null,
+      h('thead', null, h('tr', null, [t('thPlayer'), t('thWake'), t('thFly'), t('thEcho')].map(x => h('th', { key: x }, x)))),
+      h('tbody', null,
+        h('tr', null, h('td', null, batName(0)), h('td', null, t('click')), h('td', null, t('moveMouse')), h('td', null, t('rightClickOr'), ' ', K(t('keySpace')))),
+        h('tr', null, h('td', null, batName(1)), h('td', null, h(WASD)), h('td', null, h(WASD)), h('td', null, K('E'))),
+        h('tr', null, h('td', null, batName(2)), h('td', null, t('arrowKeys')), h('td', null, t('arrowKeys')), h('td', null, K('Enter'))),
+        h('tr', null, h('td', null, t('pad')), h('td', null, t('anyButton')), h('td', null, t('stick')), h('td', null, t('faceButton')))))),
+    h('p', { className: 'note' }, t('note'), ' ', K('Esc'), ' ', t('escBack')),
+    h('div', { className: 'options' },
+      h(Seg, { label: t('roundLength'), value: roundTime, onChange: setRoundTime, options: [{ v: 180, label: t('min3') }, { v: 90, label: t('sec90') }] }),
+      h(Seg, { label: t('sound'), value: sound, onChange: setSound, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] })),
+    error ? h('p', { className: 'note', style: { color: 'var(--coral)' } }, t('noRenderer')) : null,
     h('div', { className: 'actions' },
-      h('button', { type: 'button', className: 'big', disabled: !ready, onClick: onStart, autoFocus: true }, ready ? 'Start the night' : 'Loading the village…'),
-      h('p', { className: 'small' }, ready ? h(React.Fragment, null, 'or press ', K('Enter'), ' or any controller button · Renderer: ', backend) : 'Preparing 3D renderer'))));
+      h('button', { type: 'button', className: 'big', disabled: !ready, onClick: onStart, autoFocus: true }, ready ? t('start') : t('loading')),
+      h('p', { className: 'small' }, ready ? h(React.Fragment, null, t('orPress'), ' ', K('Enter'), ' ', t('orPad'), ` · ${t('renderer')}: `, backend) : t('preparing')))));
 }
 
 function End({ r, onAgain, onMenu }) {
+  const bulbs = plural('bulbs', r.burned);
   return h('div', { className: 'overlay' }, h('div', { className: 'card' },
-    h('p', { className: 'eyebrow' }, r.win ? 'Total win' : r.allCaught ? 'Every bat got caught' : 'The sun came up'),
-    h('h2', null, r.win ? 'The village is defenceless!' : 'The village survives… for now'),
-    h('p', { className: 'quote' }, r.win ? `“You burned ${r.burned} garlic bulb${r.burned === 1 ? '' : 's'}! The village is defenceless… mwahaha!”` : `“You burned ${r.burned} garlic bulb${r.burned === 1 ? '' : 's'} before sunrise. Next night, the village falls!”`),
+    h('p', { className: 'eyebrow' }, r.win ? t('winEyebrow') : r.allCaught ? t('caughtEyebrow') : t('sunEyebrow')),
+    h('h2', null, r.win ? t('winTitle') : t('loseTitle')),
+    h('p', { className: 'quote' }, t(r.win ? 'winQuote' : 'loseQuote', { n: r.burned, bulbs })),
     h('div', { className: 'stats' },
-      [[r.burned, 'Garlic bulbs burned'], [r.golden, 'Golden garlic found'], [r.caught, 'Times caught in the light'], [r.dusted, 'Bats turned to dust']].map(([v, l]) => h('div', { className: 'stat', key: l }, h('b', null, v), h('span', null, l)))),
-    h('p', { className: 'small' }, r.isBest ? 'New best heist on this computer!' : `Best heist on this computer: ${r.best} bulbs burned.`),
+      [[r.burned, t('statBurned')], [r.golden, t('statGolden')], [r.caught, t('statCaught')], [r.dusted, t('statDust')]].map(([v, l]) => h('div', { className: 'stat', key: l }, h('b', null, v), h('span', null, l)))),
+    h('p', { className: 'small' }, r.isBest ? t('newBest') : t('best', { n: r.best })),
     h('div', { className: 'actions' },
-      h('button', { type: 'button', className: 'big', onClick: onAgain, autoFocus: true }, 'Play again'),
-      h('button', { type: 'button', className: 'ghost', onClick: onMenu }, 'Back to menu'))));
+      h('button', { type: 'button', className: 'big', onClick: onAgain, autoFocus: true }, t('again')),
+      h('button', { type: 'button', className: 'ghost', onClick: onMenu }, t('backMenu')))));
 }
 
 function Hud({ hud }) {
@@ -1341,44 +1510,46 @@ function Hud({ hud }) {
   const m = Math.floor(hud.timeLeft / 60), s = String(hud.timeLeft % 60).padStart(2, '0');
   return h(React.Fragment, null,
     h('div', { className: 'hud' },
-      h('div', { className: 'left' }, h('svg', { 'aria-hidden': 'true', width: 22, height: 26, viewBox: '0 0 22 26' }, h('path', { d: 'M11 6c5 1 9 6 8 12-1 5-15 5-16 0-1-6 3-11 8-12z', fill: '#F6EEDC', stroke: '#C9B9A0', strokeWidth: 1.2 }), h('path', { d: 'M10 6l.5-5h1l.5 5z', fill: '#B8C98A' })), `${hud.left} garlic left`),
+      h('div', { className: 'left' }, h('svg', { 'aria-hidden': 'true', width: 22, height: 26, viewBox: '0 0 22 26' }, h('path', { d: 'M11 6c5 1 9 6 8 12-1 5-15 5-16 0-1-6 3-11 8-12z', fill: '#F6EEDC', stroke: '#C9B9A0', strokeWidth: 1.2 }), h('path', { d: 'M10 6l.5-5h1l.5 5z', fill: '#B8C98A' })), t('garlicLeft', { n: hud.left })),
       h('div', { className: 'skyrow' }, h('span', { className: 'moon' }),
-        h('div', { className: 'sky', style: { flex: 1 } }, h('i', { style: { width: `${Math.max(4, hud.progress * 100)}%` } }), h('span', null, hud.started ? `Sunrise in ${m}:${s}` : 'Night has not started')),
+        h('div', { className: 'sky', style: { flex: 1 } }, h('i', { style: { width: `${Math.max(4, hud.progress * 100)}%` } }), h('span', null, hud.started ? t('sunriseIn', { t: `${m}:${s}` }) : t('notStarted'))),
         h('span', { className: 'sun' })),
-      h('div', { className: 'right' }, `Burned ${hud.burned}`)),
+      h('div', { className: 'right' }, t('burned', { n: hud.burned }))),
     hud.banner ? h('div', { className: 'banner', style: { color: hud.banner.color } }, hud.banner.text) : null,
     hud.count ? h('div', { className: 'count' }, hud.count) : null,
-    hud.state === 'play' && hud.awake === 0 ? h('div', { className: 'hint' }, hud.started ? 'All bats are asleep. Click, press WASD or arrows, or a controller button to wake one.' : 'Click, press WASD or arrows, or a controller button. The sunrise timer starts with the first bat.') : null,
-    h('div', { className: 'players' }, hud.players.map(p => h('div', { key: p.name, className: 'chip' + (p.out ? ' out' : p.awake ? '' : ' sleep') },
+    hud.state === 'play' && hud.awake === 0 ? h('div', { className: 'hint' }, hud.started ? t('hintAsleep') : t('hintStart')) : null,
+    h('div', { className: 'players' }, hud.players.map(p => h('div', { key: p.slot, className: 'chip' + (p.out ? ' out' : p.awake ? '' : ' sleep') },
       h('b', { style: { background: p.color } }), p.name,
-      h('span', { className: 'hp', 'aria-label': `${p.lives} lives` }, [0, 1, 2].map(i => i < p.lives ? h('span', { key: i }, '♥') : h('s', { key: i }, '♥'))),
-      p.out ? ' out' : p.awake ? h('span', { className: 'ec' + (p.echo ? '' : ' ready') }, p.echo ? `echo ${p.echo}s` : 'echo ready') : ' asleep',
-      p.carrying ? ' · garlic' : null))),
+      h('span', { className: 'hp', 'aria-label': t('livesLabel', { n: p.lives }) }, [0, 1, 2].map(i => i < p.lives ? h('span', { key: i }, '♥') : h('s', { key: i }, '♥'))),
+      p.out ? ` ${t('chipOut')}` : p.awake ? h('span', { className: 'ec' + (p.echo ? '' : ' ready') }, p.echo ? t('chipEcho', { n: p.echo }) : t('chipEchoReady')) : ` ${t('chipAsleep')}`,
+      p.carrying ? ` · ${t('chipGarlic')}` : null))),
     h('div', { className: 'badge' }, hud.backend));
 }
 
 function App() {
   const canvasRef = useRef(null), layerRef = useRef(null), gameRef = useRef(null);
   const [screen, setScreen] = useState('menu');
-  const [ready, setReady] = useState(false), [backend, setBackend] = useState(''), [error, setError] = useState('');
+  const [ready, setReady] = useState(false), [backend, setBackend] = useState(''), [error, setError] = useState(false);
   const [hud, setHud] = useState(null), [result, setResult] = useState(null);
   const [roundTime, setRoundTime] = useState(180), [sound, setSound] = useState(true);
+  const [lang, setLangState] = useState(getLang());
+  const changeLang = l => { setLang(l); setLangState(l); };
   useEffect(() => {
     const g = new Game(canvasRef.current, layerRef.current, {
       onHud: setHud,
       onScreen: (s, r) => { if (r) setResult(r); setScreen(s); }
     });
     gameRef.current = g; window.__vgh = g;
-    g.init().then(b => { setBackend(b); setReady(true); }).catch(e => { console.error(e); setError('This browser could not start the 3D renderer. Try a recent Chrome or Edge with hardware acceleration on.'); });
+    g.init().then(b => { setBackend(b); setReady(true); }).catch(e => { console.error(e); setError(true); });
   }, []);
   useEffect(() => { if (gameRef.current) gameRef.current.roundTime = roundTime; }, [roundTime]);
   useEffect(() => { if (gameRef.current) gameRef.current.sound.setOn(sound); }, [sound]);
   const start = () => { const g = gameRef.current; if (g && ready) { g.roundTime = roundTime; g.start(); } };
   return h(React.Fragment, null,
-    h('canvas', { ref: canvasRef, className: 'stage', 'aria-label': 'Vampire Garlic Heist: a 3D village at night' }),
+    h('canvas', { ref: canvasRef, className: 'stage', 'aria-label': t('canvasLabel') }),
     h('div', { ref: layerRef, className: 'layer', 'aria-hidden': 'true' }),
     screen !== 'menu' && screen !== 'end' ? h(Hud, { hud }) : null,
-    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, onStart: start }) : null,
+    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start }) : null,
     screen === 'end' && result ? h(End, { r: result, onAgain: start, onMenu: () => gameRef.current.toMenu() }) : null);
 }
 

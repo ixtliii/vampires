@@ -5,9 +5,10 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Sound } from './audio.js';
+import { t as tr, batName } from './i18n.js';
 import {
   CASTLE_X, FURNACE, FLY_Y, GRAB_TIME, GRAB_R, MAXV, CARRY_V, ECHO_CD, ECHO_DUR, IDLE_SLEEP,
-  LIGHT_R0, LIGHT_R1, NOTICE, LAMP_R, LAMP_SLOW, THIRD_WATCHMAN_AT, ROOF_COLORS, BAT_COLORS, BAT_NAMES,
+  LIGHT_R0, LIGHT_R1, NOTICE, LAMP_R, LAMP_SLOW, THIRD_WATCHMAN_AT, ROOF_COLORS, BAT_COLORS,
   STREET_W, PLAZA, STREETS, HOUSES, PATHS, LAMPS, TREES, GRAVEYARD, STALLS
 } from './config.js';
 
@@ -406,10 +407,10 @@ export class Game {
     const bGlow = this.glowDisc(color, .8); bGlow.scale.setScalar(2.6); bGlow.position.y = .13;
     const beacon = new THREE.Group(); beacon.add(arrow); beacon.add(bRing); beacon.add(bGlow); beacon.visible = false; this.scene.add(beacon);
     const tag = document.createElement('div'); tag.className = 'tag';
-    tag.innerHTML = `<span class="nm" style="color:${color}">${BAT_NAMES[slot]}</span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span><span class="echo"><i></i><em>Echo</em></span><span class="grab" hidden></span>`;
+    tag.innerHTML = `<span class="nm" style="color:${color}"></span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span><span class="echo"><i></i><em>Echo</em></span><span class="grab" hidden></span>`;
     this.layer.appendChild(tag);
     const roof = slot < 3 ? { x: 11.9 + slot * 1.35, z: -8.1 } : { x: 11.9 + (slot - 3) * .95, z: 8.1 };
-    return { slot, color, name: BAT_NAMES[slot], state: 'sleep', x: roof.x, z: roof.z, vx: 0, vz: 0, roof, yaw: 0,
+    return { slot, color, get name() { return batName(slot); }, state: 'sleep', x: roof.x, z: roof.z, vx: 0, vz: 0, roof, yaw: 0,
       carrying: null, grabT: 0, grabSpot: null, stunT: 0, invulnT: 0, echo: null, echoCd: 0, idleT: 0, wakeT: 0, pulseT: 0, lives: LIVES,
       g, wingL, wingR, eyes, ring, carry, carryGold, beacon, arrow, bRing, bGlow, waves, inLamp: false, tag,
       tagNm: tag.querySelector('.nm'), tagHearts: [...tag.querySelectorAll('.hearts i')], tagEcho: tag.querySelector('.echo'), tagEchoTxt: tag.querySelector('.echo em'),
@@ -489,7 +490,7 @@ export class Game {
     });
     window.addEventListener('keyup', e => this.keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
     window.addEventListener('blur', () => this.keys.clear());
-    window.addEventListener('gamepadconnected', e => { if (this.state === 'play') this.showBanner(`Controller ${e.gamepad.index + 1} connected: press a button to wake a bat`, 3, '#9FE0C9'); });
+    window.addEventListener('gamepadconnected', e => { if (this.state === 'play') this.showBanner(tr('padConnected', { n: e.gamepad.index + 1 }), 3, '#9FE0C9'); });
   }
   readPads() {
     let pads = [];
@@ -523,7 +524,7 @@ export class Game {
   start() {
     this.sound.init(); this.sound.music = true; this.sound.step = 0; this.sound.next = this.sound.now() + .1;
     this.resetRound(); this.state = 'play';
-    this.showBanner('Wake up a bat to begin!', 999);
+    this.showBanner(tr('wakeToBegin'), 999);
     this.cb.onScreen('play');
   }
   toMenu() {
@@ -578,10 +579,10 @@ export class Game {
   wake(b) {
     if (this.state !== 'play' || b.state !== 'sleep' || b.lives <= 0) return;
     Object.assign(b, { state: 'active', wakeT: .8, idleT: 0, x: b.roof.x, z: b.roof.z + (b.roof.z < 0 ? 1 : -1), vx: 0, vz: 0, echoCd: 0, stunT: 0, invulnT: 0, inLamp: false });
-    this.addFloat(b.x, FLY_Y + .8, b.z, 'yaaawn~', b.color, 22);
+    this.addFloat(b.x, FLY_Y + .8, b.z, tr('yawn'), b.color, 22);
     this.burst(b.x, FLY_Y, b.z, 14, [b.color, '#F6F1E7'], 3);
     this.sound.play('yawn'); this.rumble(b, .25, .4, .2);
-    if (!this.started) { this.started = true; this.showBanner('Steal the garlic before sunrise!', 2.5); }
+    if (!this.started) { this.started = true; this.showBanner(tr('stealBefore'), 2.5); }
     const n = this.activeBats().length;
     if (n > this.maxActive) { if (n >= 2) this.moreGarlic(GARLIC_PER_EXTRA_BAT); this.maxActive = n; }
   }
@@ -589,7 +590,7 @@ export class Game {
     const normal = this.spots.filter(s => !s.golden);
     const empty = shuffle(normal.filter(s => s.count === 0)), full = shuffle(normal.filter(s => s.count > 0));
     empty.concat(full).slice(0, n).forEach(s => { s.count++; this.burst(s.x, .5, s.z, 10, ['#F5D66B', '#F6F1E7'], 2.5); });
-    this.showBanner(`More bats, bigger heist: +${n} garlic!`, 2.5, '#F5D66B'); this.sound.play('more');
+    this.showBanner(tr('moreGarlic', { n }), 2.5, '#F5D66B'); this.sound.play('more');
   }
   sleepBat(b, silent) {
     if (b.carrying) { this.flyBack(b.carrying, b.x, b.z, 1); b.carrying = null; }
@@ -623,9 +624,9 @@ export class Game {
     this.addFloat(src.x, 2.8, src.z, word, '#F07A6A', 32);
     this.burst(b.x, FLY_Y, b.z, 16, ['#F07A6A', '#FFE08A'], 4);
     this.sound.play('alarm'); this.rumble(b, .4, .8, 1);
-    if (b.lives > 0) { this.addFloat(b.x, FLY_Y + 1.2, b.z, `−1 ♥  (${b.lives} left)`, '#F07A6A', 22, 1.6); return; }
+    if (b.lives > 0) { this.addFloat(b.x, FLY_Y + 1.2, b.z, tr('lifeLost', { n: b.lives }), '#F07A6A', 22, 1.6); return; }
     // out of lives: the bat is out for the rest of the night
-    this.addFloat(b.x, FLY_Y + 1.2, b.z, `${b.name} is out!`, '#F07A6A', 26, 2);
+    this.addFloat(b.x, FLY_Y + 1.2, b.z, tr('isOut', { name: b.name }), '#F07A6A', 26, 2);
     this.burst(b.x, FLY_Y, b.z, 30, ['#BDB6CF', '#8E86A8', b.color], 3.5, 1.1, 1.4, 1.5);
     this.sound.play('puff'); this.rumble(b, .6, 1, 1);
     this.sleepBat(b, true); b.state = 'out';
@@ -661,7 +662,7 @@ export class Game {
     const w3 = this.watchmen[2];
     if (!w3.active && this.started && (this.activeBats().length >= 3 || p >= THIRD_WATCHMAN_AT)) {
       Object.assign(w3, { active: true, x: w3.path[0][0], z: w3.path[0][1], seg: 1, mode: 'patrol' });
-      if (!this.shiftDone) { this.shiftDone = true; this.showBanner('The night shift starts: another watchman!', 3, '#F07A6A'); this.sound.play('alarm'); }
+      if (!this.shiftDone) { this.shiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A'); this.sound.play('alarm'); }
     }
 
     this.updateWatchmen(dt, p, !this.started);
@@ -676,7 +677,7 @@ export class Game {
       if (b.state !== 'active') return;
       const wasCooling = b.echoCd > 0;
       b.wakeT = Math.max(0, b.wakeT - dt); b.echoCd = Math.max(0, b.echoCd - dt);
-      if (wasCooling && b.echoCd <= 0 && this.state === 'play') { this.addFloat(b.x, FLY_Y + 1.1, b.z, 'echo ready!', '#7FD6E0', 18, 1); this.sound.play('ready'); this.rumble(b, .08, .3, 0); } b.stunT = Math.max(0, b.stunT - dt); b.invulnT = Math.max(0, b.invulnT - dt);
+      if (wasCooling && b.echoCd <= 0 && this.state === 'play') { this.addFloat(b.x, FLY_Y + 1.1, b.z, tr('echoReady'), '#7FD6E0', 18, 1); this.sound.play('ready'); this.rumble(b, .08, .3, 0); } b.stunT = Math.max(0, b.stunT - dt); b.invulnT = Math.max(0, b.invulnT - dt);
       if (b.echo) { b.echo.t += dt; if (b.echo.t > ECHO_DUR || (b.echo.spot && b.echo.spot.count <= 0)) b.echo = null; }
       let dvx = 0, dvz = 0, input = false;
       const vmax = (b.carrying ? CARRY_V : MAXV) * (b.inLamp ? LAMP_SLOW : 1);
@@ -714,20 +715,20 @@ export class Game {
           near = true;
           if (b.carrying && b.invulnT <= 0 && w.mode !== 'chase' && w.alertT <= 0) {
             w.mode = 'chase'; w.chaseBat = b; w.chaseT = 2.4; w.pause = 0;
-            this.addFloat(w.x, 2.3, w.z, 'Hey!', '#F07A6A', 26); this.sound.play('hey');
+            this.addFloat(w.x, 2.3, w.z, tr('hey'), '#F07A6A', 26); this.sound.play('hey');
           }
         } else if (d < R + 2.6) near = true;
       });
       // street lamps
       // street lamps don't catch you, their light just slows you down
       const lamp = this.lamps.some(L => L.onNow && d2(b.x, b.z, L.x, L.z) < LAMP_R);
-      if (lamp && !b.inLamp) { this.addFloat(b.x, FLY_Y + 1, b.z, 'slooow…', '#FFE9A8', 20, 1); this.rumble(b, .2, .5, 0); }
+      if (lamp && !b.inLamp) { this.addFloat(b.x, FLY_Y + 1, b.z, tr('slow'), '#FFE9A8', 20, 1); this.rumble(b, .2, .5, 0); }
       b.inLamp = lamp;
       if (lamp && Math.random() < dt * 12) this.burst(b.x, FLY_Y, b.z, 1, ['#FFE9A8'], .6, .6, .7);
       if (lit || near) { b.pulseT -= dt; if (b.pulseT <= 0) { b.pulseT = .75; this.rumble(b, .09, .25, .35); } }
       // watchmen only catch a bat that is carrying garlic
       if (lit && b.carrying && b.stunT <= 0 && b.invulnT <= 0) {
-        this.caughtBat(b, lit, 'Thief!'); lit.alertT = 1.6; lit.pause = 1.2; lit.mode = 'return'; lit.chaseBat = null;
+        this.caughtBat(b, lit, tr('thief')); lit.alertT = 1.6; lit.pause = 1.2; lit.mode = 'return'; lit.chaseBat = null;
         if (b.state !== 'active') return;
       }
       if (lit) { b.grabT = 0; b.grabSpot = null; }
@@ -739,14 +740,14 @@ export class Game {
           b.grabT += dt; if (best.golden) best.revealT = Math.max(best.revealT, .6);
           if (b.grabT >= GRAB_TIME) {
             best.count--; b.carrying = best; b.grabT = 0; b.grabSpot = null;
-            this.addFloat(b.x, FLY_Y + .9, b.z, 'yuck!', '#9FE0C9', 28); this.sound.play('yuck'); this.rumble(b, .15, .35, .6);
+            this.addFloat(b.x, FLY_Y + .9, b.z, tr('yuck'), '#9FE0C9', 28); this.sound.play('yuck'); this.rumble(b, .15, .35, .6);
           }
         } else { b.grabSpot = best; b.grabT = 0; }
       }
       // burn it
       if (b.carrying && d2(b.x, b.z, FURNACE.x, FURNACE.z) < FURNACE.r + .35) {
         const g = b.carrying.golden; b.carrying = null; this.burned++; if (g) this.goldenFound++;
-        this.addFloat(FURNACE.x, 3, FURNACE.z, g ? '+3 golden!' : 'whoosh! +1', g ? '#FFD84A' : '#F5D66B', 30);
+        this.addFloat(FURNACE.x, 3, FURNACE.z, g ? tr('golden') : tr('whoosh'), g ? '#FFD84A' : '#F5D66B', 30);
         this.burst(FURNACE.x, 1, FURNACE.z, 30, ['#F5D66B', '#F4B183', '#F07A6A', '#FFF3B0'], 5, 1, 1.4, 4);
         this.sound.play('whoosh'); this.rumble(b, .25, .6, .6);
       }
@@ -755,16 +756,16 @@ export class Game {
     if (this.state === 'play' && this.started) {
       this.elapsed += dt;
       const pp = this.elapsed / this.roundTime;
-      if (pp >= .86 && !this.roosterDone) { this.roosterDone = true; this.sound.play('rooster'); this.showBanner('Cock-a-doodle-doo! Back to the castle!', 4, '#F4B183'); }
-      if (this.remaining() === 0) { this.state = 'countdown'; this.cdT = 3; this.lastCd = 4; this.showBanner('All the garlic is gone! Hold on…', 3, '#F5D66B'); }
+      if (pp >= .86 && !this.roosterDone) { this.roosterDone = true; this.sound.play('rooster'); this.showBanner(tr('rooster'), 4, '#F4B183'); }
+      if (this.remaining() === 0) { this.state = 'countdown'; this.cdT = 3; this.lastCd = 4; this.showBanner(tr('allGone'), 3, '#F5D66B'); }
       else if (pp >= 1) this.sunUp();
       else if (this.activeBats().length === 0 && this.bats.some(b => b.state === 'out')) { // the last bat in the air got caught
-        this.state = 'sunup'; this.cdT = 2; this.outEnd = true; this.showBanner('Every bat got caught!', 2, '#F07A6A');
+        this.state = 'sunup'; this.cdT = 2; this.outEnd = true; this.showBanner(tr('allCaught'), 2, '#F07A6A');
       }
     } else if (this.state === 'countdown') {
       this.cdT -= dt; const sc = Math.ceil(this.cdT);
       if (sc < this.lastCd && sc > 0) { this.lastCd = sc; this.sound.play('tick'); }
-      if (this.cdT <= 0) { this.state = 'boss'; this.bossT = 0; this.banner = null; this.sound.play('mwahaha'); this.addFloat(6, 5, 0, 'MWAHAHA!', '#F5D66B', 64, 3.4); }
+      if (this.cdT <= 0) { this.state = 'boss'; this.bossT = 0; this.banner = null; this.sound.play('mwahaha'); this.addFloat(6, 5, 0, tr('mwahaha'), '#F5D66B', 64, 3.4); }
     } else if (this.state === 'boss') {
       this.bossT += dt; if (this.bossT > 3.6) this.finish(true);
     } else if (this.state === 'sunup') {
@@ -820,7 +821,7 @@ export class Game {
       if (b.state !== 'active') continue;
       if (d2(b.x, b.z, c.x, c.z) < (b.carrying ? 2.2 : 1.3)) {
         c.cd = 7; c.pause = 1.5;
-        this.addFloat(c.x, 1.3, c.z, 'Meow!', '#F4B183', 24); this.sound.play('meow');
+        this.addFloat(c.x, 1.3, c.z, tr('meow'), '#F4B183', 24); this.sound.play('meow');
         const w = this.nearestWatchman(c.x, c.z);
         if (w) { w.mode = 'investigate'; w.inv = { x: c.x, z: c.z }; w.pause = 0; this.addFloat(w.x, 2.3, w.z, '?', '#F07A6A', 34); }
         break;
@@ -835,7 +836,7 @@ export class Game {
       if (b.x < CASTLE_X) { this.burst(b.x, FLY_Y, b.z, 34, ['#BDB6CF', '#8E86A8', '#F6F1E7'], 3.5, 1.2, 1.6, 1.5); this.dusted++; any = true; this.sleepBat(b, true); }
     });
     if (any) this.sound.play('puff');
-    this.showBanner(any ? 'The sun is up! Poof…' : 'The sun is up! Everyone made it to the castle.', 2.4, '#F4B183');
+    this.showBanner(any ? tr('sunPoof') : tr('sunSafe'), 2.4, '#F4B183');
   }
 
   // =================================================================
@@ -938,10 +939,10 @@ export class Game {
       const [sx, sy] = this.toScreen(b.g.position.x, b.g.position.y + (sleeping ? .7 + (b.slot % 2) * .55 : .8), b.g.position.z);
       b.tag.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
       const cache = b.tagCache, out = b.state === 'out';
-      const nm = out ? `${b.name} · out` : sleeping ? `zzz ${b.name}` : b.name;
+      const nm = out ? tr('tagOut', { name: b.name }) : sleeping ? tr('tagSleep', { name: b.name }) : b.name;
       if (cache.nm !== nm) { cache.nm = nm; b.tagNm.textContent = nm; b.tag.classList.toggle('sleep', sleeping); b.tag.classList.toggle('out', out); }
       if (cache.lives !== b.lives) { cache.lives = b.lives; b.tagHearts.forEach((hEl, i) => hEl.classList.toggle('lost', i >= b.lives)); }
-      const ready = b.echoCd <= 0 && b.wakeT <= 0, echoTxt = sleeping ? '' : ready ? 'Echo ready' : `Echo ${Math.ceil(b.echoCd)}s`;
+      const ready = b.echoCd <= 0 && b.wakeT <= 0, echoTxt = sleeping ? '' : ready ? tr('tagEchoReady') : tr('tagEcho', { n: Math.ceil(b.echoCd) });
       if (cache.echo !== echoTxt) { cache.echo = echoTxt; b.tagEcho.hidden = sleeping; b.tagEchoTxt.textContent = echoTxt; b.tagEcho.classList.toggle('ready', ready); }
       if (!ready && !sleeping) b.tagEcho.style.setProperty('--p', (1 - b.echoCd / ECHO_CD).toFixed(3));
       const gp = b.grabT > 0 ? b.grabT / GRAB_TIME : 0;
@@ -991,7 +992,7 @@ export class Game {
       banner: this.banner ? { text: this.banner.text, color: this.banner.color } : null,
       count: this.state === 'countdown' ? Math.max(1, Math.ceil(this.cdT)) : 0,
       awake: this.activeBats().length,
-      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ name: b.name, color: b.color, awake: b.state === 'active', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0 })),
+      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0 })),
       backend: this.backend
     };
   }

@@ -2,7 +2,7 @@
 :root{
   --night:#16132B; --panel:#241F4A; --panel-2:#2E2860;
   --lavender:#C9B8F5; --garlic:#F5D66B; --cream:#F6F1E7; --soft:#DCD3F5; --coral:#F07A6A; --mint:#9FE0C9; --teal:#7FD6E0;
-  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --display:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;
   --body:'Nunito Sans','Segoe UI',system-ui,sans-serif;
   color-scheme:dark;
 }

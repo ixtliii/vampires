@@ -19,6 +19,10 @@ Everything the game needs is in `vendor/`, so it runs without internet. Only the
 
 Add `?webgl` to the address (`http://localhost:8000/?webgl`) to force the WebGL 2 renderer, for example if the screen stays dark. The badge in the bottom-right corner shows which renderer is running.
 
+## Languages
+
+The game is in English, Dutch and Russian. Pick one at the top of the menu. The choice is remembered on that computer, and the first time the game follows the browser's language. All texts are in `src/i18n.js`, including the in-game messages. To add a language, copy the `en` block there, translate it, and add it to `LANGS`.
+
 ## Controls
 
 | Player | Wake up | Fly | Echolocate |
@@ -67,6 +71,7 @@ If the models can't load, the game uses simple built-in shapes instead.
 ```
 index.html        entry page
 styles.css        menus and HUD
+src/i18n.js       all texts in English, Dutch and Russian
 src/config.js     tuning values and the whole village layout (streets, houses, routes, lamps, trees)
 src/game.js       3D scene, game rules, input, Joy-Con rumble
 src/audio.js      music and sound effects (synthesised, no audio files)

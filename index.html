@@ -6,7 +6,7 @@
 <title>Vampire Garlic Heist 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,22 +19,32 @@
 <!-- if the game fails to start, say why instead of showing a dark page -->
 <div id="boot-error" hidden style="position:fixed;inset:0;display:grid;place-items:center;padding:24px;font:16px/1.5 system-ui,sans-serif;color:#F6F1E7;background:#16132B">
   <div style="max-width:620px">
-    <p style="font:700 24px system-ui,sans-serif;color:#F5D66B;margin:0 0 8px">The game couldn’t start</p>
-    <p style="margin:0 0 8px">Press <b>Cmd + Shift + R</b> (Mac) or <b>Ctrl + Shift + R</b> (Windows) to reload without the browser’s old copies. If that doesn’t help, close every game window, then start the game again with start-mac.command or start-windows.bat.</p>
-    <p style="margin:0;opacity:.7;font-size:13px">Details: <span id="boot-error-msg"></span></p>
+    <p id="boot-error-title" style="font:700 24px system-ui,sans-serif;color:#F5D66B;margin:0 0 8px"></p>
+    <p id="boot-error-help" style="margin:0 0 8px"></p>
+    <p style="margin:0;opacity:.7;font-size:13px"><span id="boot-error-label"></span> <span id="boot-error-msg"></span></p>
   </div>
 </div>
 <script>
   (function () {
+    var T = {
+      en: ['The game couldn’t start', 'Press Cmd + Shift + R (Mac) or Ctrl + Shift + R (Windows) to reload without the browser’s old copies. If that doesn’t help, close every game window, then start the game again with start-mac.command or start-windows.bat.', 'Details:'],
+      nl: ['Het spel kon niet starten', 'Druk op Cmd + Shift + R (Mac) of Ctrl + Shift + R (Windows) om opnieuw te laden zonder de oude kopieën van de browser. Helpt dat niet, sluit dan alle spelvensters en start het spel opnieuw met start-mac.command of start-windows.bat.', 'Details:'],
+      ru: ['Игра не запустилась', 'Нажмите Cmd + Shift + R (Mac) или Ctrl + Shift + R (Windows), чтобы перезагрузить страницу без старых копий файлов. Если не помогло, закройте все окна игры и запустите её заново через start-mac.command или start-windows.bat.', 'Подробности:']
+    };
+    var lang = 'en';
+    try { var l = localStorage.getItem('vgh-lang') || (navigator.language || '').slice(0, 2); if (T[l]) lang = l; } catch (e) {}
     var shown = false;
     function fail(msg) {
       if (shown) return; shown = true;
-      document.getElementById('boot-error-msg').textContent = msg || 'nothing was drawn';
+      document.getElementById('boot-error-title').textContent = T[lang][0];
+      document.getElementById('boot-error-help').textContent = T[lang][1];
+      document.getElementById('boot-error-label').textContent = T[lang][2];
+      document.getElementById('boot-error-msg').textContent = msg || '';
       document.getElementById('boot-error').hidden = false;
     }
     window.addEventListener('error', function (e) { if (!window.__vgh) fail(e.message || (e.target && e.target.src ? 'could not load ' + e.target.src : 'a file failed to load')); }, true);
     window.addEventListener('unhandledrejection', function (e) { if (!window.__vgh || !window.__vgh.bats) fail(String(e.reason && e.reason.message || e.reason)); });
-    setTimeout(function () { if (!document.querySelector('#root .overlay, #root canvas')) fail('the game code did not run (try a hard reload)'); }, 8000);
+    setTimeout(function () { if (!document.querySelector('#root .overlay, #root canvas')) fail('the game code did not run'); }, 8000);
   })();
 </script>
 </body>

@@ -5,16 +5,17 @@ import re, pathlib
 root = pathlib.Path(__file__).parent
 css = (root / 'styles.css').read_text(encoding='utf-8')
 code = ['import * as THREE from \'three\';']
-for name in ['config.js', 'audio.js', 'game.js', 'ui.js']:
+for name in ['config.js', 'i18n.js', 'audio.js', 'game.js', 'ui.js']:
     src = (root / 'src' / name).read_text(encoding='utf-8')
     src = re.sub(r"^import [^;]*? from '(\./[^']+|three)';\n", '', src, flags=re.M | re.S)
     src = re.sub(r'^export ', '', src, flags=re.M)
+    if name == 'i18n.js': src += '\nconst tr = t; // game.js imports t as tr\n'
     code.append(f'// ----- src/{name} -----\n' + src)
 html = f'''<meta charset="utf-8">
 <title>Vampire Garlic Heist 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 {css}</style>
 <div id="root"></div>
