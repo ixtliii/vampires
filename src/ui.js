@@ -1,6 +1,6 @@
 // =====================================================================
 // Vampire Garlic Heist: React UI (menu, HUD, score screen). React is loaded as a global from vendor/.
-// All text comes from i18n.js (English, Dutch, Russian).
+// All text comes from i18n.js (English, Dutch, Russian, Ukrainian).
 // =====================================================================
 import { Game } from './game.js';
 import { t, plural, batName, LANGS, getLang, setLang } from './i18n.js';
