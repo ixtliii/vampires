@@ -60,6 +60,15 @@ export class Sound {
         this.tone(150, .5, 'sawtooth', .2, t, 120);
         [.55, .85, 1.15, 1.45].forEach((d, i) => this.tone(240 - i * 22, .24, 'sawtooth', .2, t + d, 170 - i * 18));
         this.tone(70, 1.9, 'sine', .28, t, 45); break;
+      // new sounds: each event has its own sound so the icons don't need words
+      case 'lifeLost': [0, .16, .32].forEach((d, i) => this.tone(520 - i * 110, .2, 'triangle', .18, t + d, 400 - i * 100)); break;
+      case 'snore': this.noise(.7, 180, 420, .12, 2, t); this.tone(95, .7, 'sine', .08, t, 75); break;
+      case 'pass': this.tone(500, .12, 'sine', .16, t, 900); this.tone(900, .16, 'triangle', .14, t + .1, 1400); break;
+      case 'clap': this.noise(.09, 1800, 2400, .5, .8, t); this.tone(523, .14, 'triangle', .1, t + .03, 587); break;
+      case 'slow': this.tone(300, .4, 'sine', .14, t, 160); break;
+      case 'faster': this.tone(420, .08, 'square', .06, t); this.tone(560, .08, 'square', .06, t + .08); break;
+      case 'cage': this.noise(.25, 300, 900, .35, 1.2, t); this.tone(140, .35, 'square', .1, t, 90); this.tone(220, .2, 'triangle', .12, t + .18, 180); break;
+      case 'free': [0, .09, .18, .27].forEach((d, i) => this.tone([523, 659, 784, 1046][i], .18, 'triangle', .15, t + d)); break;
       case 'rooster': {
         const ac = this.ac, o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
         o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.value = 2400;

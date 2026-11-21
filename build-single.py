@@ -5,7 +5,7 @@ import re, pathlib
 root = pathlib.Path(__file__).parent
 css = (root / 'styles.css').read_text(encoding='utf-8')
 code = ['import * as THREE from \'three\';']
-for name in ['config.js', 'i18n.js', 'audio.js', 'game.js', 'ui.js']:
+for name in ['config.js', 'i18n.js', 'icons.js', 'clap.js', 'buildings.js', 'paint.js', 'audio.js', 'game.js', 'ui.js']:
     src = (root / 'src' / name).read_text(encoding='utf-8')
     src = re.sub(r"^import [^;]*? from '(\./[^']+|three)';\n", '', src, flags=re.M | re.S)
     src = re.sub(r'^export ', '', src, flags=re.M)
@@ -15,7 +15,7 @@ html = f'''<meta charset="utf-8">
 <title>Vampire Garlic Heist 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&family=Nunito:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 {css}</style>
 <div id="root"></div>
@@ -27,7 +27,7 @@ html = f'''<meta charset="utf-8">
 </script>
 '''
 import base64
-data = {n: base64.b64encode((root / 'models' / f'{n}.glb').read_bytes()).decode() for n in ['bat', 'vampire']}
+data = {n: base64.b64encode((root / 'models' / f'{n}.glb').read_bytes()).decode() for n in ['batrig', 'hunter', 'garlic', 'vampire']}
 (root / 'models' / 'models.js').write_text('window.VGH_MODEL_DATA = ' + __import__('json').dumps(data) + ';\n', encoding='utf-8')
 html = html.replace('<div id="root"></div>', '<div id="root"></div>\n<script src="models/models.js"></script>')
 (root / 'vampire-garlic-heist-3d.html').write_text(html, encoding='utf-8')

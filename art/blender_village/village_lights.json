@@ -1,0 +1,201 @@
+{
+ "lights": [
+  {
+   "type": "hemi",
+   "name": "HemisphereLight",
+   "pos": [
+    0,
+    1,
+    0
+   ],
+   "color": "#8a6ad0",
+   "ground": "#2e1840",
+   "intensity": 1.4,
+   "distance": 0,
+   "target": null
+  },
+  {
+   "type": "sun",
+   "name": "Key",
+   "pos": [
+    -20,
+    9,
+    5
+   ],
+   "color": "#d0a8ff",
+   "ground": null,
+   "intensity": 1.3,
+   "distance": 0,
+   "target": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "type": "point",
+   "name": "Furnace",
+   "pos": [
+    13.3,
+    2,
+    0
+   ],
+   "color": "#ff9a4a",
+   "ground": null,
+   "intensity": 42.97335448968962,
+   "distance": 14,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    -10,
+    2.1,
+    0
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 5,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    5,
+    2.1,
+    0
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 5,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    -2,
+    2.1,
+    -4.8
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 5,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    -2,
+    2.1,
+    4.8
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 0,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    -20.5,
+    2.1,
+    0
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 5,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    -10,
+    2.1,
+    -9.2
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 5,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "point",
+   "name": "Lamp",
+   "pos": [
+    -10,
+    2.1,
+    9.2
+   ],
+   "color": "#ffe3a0",
+   "ground": null,
+   "intensity": 0,
+   "distance": 6,
+   "target": null
+  },
+  {
+   "type": "sun",
+   "name": "Moon",
+   "pos": [
+    14,
+    12,
+    -14
+   ],
+   "color": "#a07cff",
+   "ground": null,
+   "intensity": 1,
+   "distance": 0,
+   "target": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "type": "sun",
+   "name": "Bounce",
+   "pos": [
+    -14,
+    6,
+    14
+   ],
+   "color": "#f5a8d8",
+   "ground": null,
+   "intensity": 0.35,
+   "distance": 0,
+   "target": [
+    0,
+    0,
+    0
+   ]
+  }
+ ],
+ "camera": {
+  "pos": [
+   -3,
+   26.876510892903056,
+   17.344307943232312
+  ],
+  "quat": [
+   -0.4848096202463371,
+   0,
+   0,
+   0.8746197071393957
+  ],
+  "fov": 38,
+  "aspect": 1.7777777777777777
+ },
+ "background": "#2a1850",
+ "fog": null
+}

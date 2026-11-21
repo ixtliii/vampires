@@ -97,3 +97,48 @@ To change the village, edit the `STREETS`, `HOUSES`, `PATHS` and `LAMPS` lists i
 
 Starting garlic (10) and garlic per extra bat (3) are set at the top of `src/game.js`.
 # vampires
+
+## Prototyping round 2 (new mechanics)
+
+- **Sleeping bat:** a bat caught with garlic loses a heart, drops the bulb and naps on the ground for 4 seconds (zzz), then wakes up by itself. It blinks for 2 more seconds and can't be caught then. 0 hearts = out for the night.
+- **Pass garlic:** fly close to a teammate and press Pass (mouse bat: F or middle-click, Keys 1: Q, Keys 2: Right Shift or /, Joy-Con: SL/SR). A pass icon shows above your bat when someone is in range.
+- **Crowd clapping slows the sunrise:** turn on *Crowd clapping → Microphone* in the menu. Each clap pushes the sunrise back 1 second (max 20 s per night). Sensitivity Low/Medium/High; the meter's white line is the clap threshold, which follows the room's noise. Backup: the clap button (bottom right) or the C key.
+- **Watchmen get faster** with every burned bulb (capped).
+- **Garlic jar** (top left) counts burned bulbs; **the sunrise** now creeps around the edge of the screen.
+- Pop-up words are replaced by icons + sounds.
+- Tuning lives in `src/config.js`: `NAP_TIME`, `PASS_R`, `WATCH_SPEEDUP`, `WATCH_SPEEDUP_MAX`, `CLAP_PUSH`, `CLAP_MAX`.
+- The microphone only works on `localhost` or `https://` (the start scripts use localhost).
+
+## Picture tutorial
+
+When the first bat of a round wakes up, the night pauses and four tiny animated scenes show how to play:
+fly to the garlic, hover to grab it, burn it in the castle fire, stay out of the lantern light.
+Each scene plays for about 3 seconds; any key, click or controller button skips ahead. The sunrise timer
+only starts after the tutorial. Turn it off in the menu (*Tutorial: Off*) for experienced players.
+
+## Rigged characters (art/character_rigged.blend)
+
+- **Night watchman** = the rigged "hunter" (`Armature`), with the separate `Lantern` in his left hand.
+- **Bats** = the rigged bat (`Armature.002`); its purple body material (`Material.015`) takes each player's colour.
+- **Garlic** = `garlic.005` with its root (the colour gradient is rebuilt in code, because Blender's procedural ramp doesn't export).
+- The file has no animations; the game moves the bones itself: walk cycle, swinging arm, lantern held out, leaning
+  forward when chasing, looking around when idle; the bats flap their wing bones, dangle their legs and fold their wings when asleep.
+- After editing the .blend, re-export with:  `blender -b art/character_rigged.blend --python art/export_rigged.py`
+  then run `python3 build-single.py` to refresh the web version. Keep the bone names (spine, head, bicep.L/R, thigh.L/R,
+  calf.L/R, palm.L for the hunter; core.L/R, upper wing.L/R, middle wing.L/R, leg.L/R, head for the bat).
+- The vampire boss still comes from art/character.blend (models/vampire.glb).
+
+## The jail (instead of game over)
+
+- A bat that loses its last heart is grabbed by the watchman, held up high and carried along the streets to the
+  jail in the bottom-right corner (it replaced one house). While he carries a bat, that watchman catches nobody else.
+- Bats in jail get out by themselves after 20 seconds with 1 heart. Teammates who hover inside the mint ring at the
+  jail door for 2 seconds break everyone out at once ("Jailbreak!"), with 2 hearts each. The tag above the jail
+  shows how many bats are inside and fills up while friends are helping.
+- Tuning in `src/config.js`: `CAGE_TIME`, `CAGE_LIVES`, `RESCUE_R`, `RESCUE_TIME`, `RESCUE_LIVES`; grab zone: `GRAB_R`.
+
+## Lighting through the night
+
+The light follows the clock: violet dusk, cold blue midnight with the moon overhead, pink pre-dawn, a low orange dawn
+with long shadows, then golden sunrise. Crowd claps push it back too. The colours are the `SKY_KEYS` table in `src/game.js`.
+

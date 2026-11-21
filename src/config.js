@@ -9,7 +9,7 @@ export const CASTLE_X = 10.5;
 export const FURNACE = { x: 13.3, z: 0, r: 1.45 };
 export const FLY_Y = 2.2;
 export const GRAB_TIME = 2;          // seconds hovering over garlic to grab it
-export const GRAB_R = 0.95;          // how close a bat must hover
+export const GRAB_R = 1.5;           // how close a bat must hover (its ring on the ground shows this zone)
 export const MAXV = 8.5;             // bat speed
 export const CARRY_V = 6.0;          // bat speed while carrying garlic
 export const ECHO_CD = 6, ECHO_R = 4.2, ECHO_DUR = 2.6;
@@ -19,43 +19,64 @@ export const NOTICE = 1.7;           // watchman notices a garlic carrier within
 export const LAMP_R = 1.6;           // street lamp light radius
 export const LAMP_SLOW = 0.45;       // bats in lamp light fly at this share of their speed
 export const THIRD_WATCHMAN_AT = 0.4; // share of the night after which the night shift starts
+export const NAP_TIME = 4;           // seconds a caught bat sleeps before it wakes up by itself
+export const PASS_R = 2.4;           // how close a teammate must be to pass garlic to them
+export const WATCH_SPEEDUP = 0.06;   // watchmen walk this much faster for every burned bulb...
+export const WATCH_SPEEDUP_MAX = 1.2; // ...up to this much faster
+export const CLAP_PUSH = 1;          // seconds each crowd clap pushes the sunrise back...
+export const CLAP_MAX = 20;          // ...up to this many seconds per night
+export const CAGE_TIME = 20;         // a bat that loses its last heart sits in a cage this long, then gets out by itself...
+export const CAGE_LIVES = 1;         // ...with this many hearts
+export const RESCUE_R = 1.6;         // a teammate hovering this close to the cage...
+export const RESCUE_TIME = 2;        // ...for this many seconds frees it sooner...
+export const RESCUE_LIVES = 2;       // ...with this many hearts
 
 // ---- colours ----
 export const ROOF_COLORS = ['#C9B8F5', '#9FE0C9', '#F4B183', '#F5A8D8', '#7FD6E0', '#F5D66B', '#F7A193'];
 export const BAT_COLORS = ['#C9B8F5', '#9FE0C9', '#F07A6A', '#F5D66B', '#F4B183', '#7FD6E0', '#F5A8D8'];
 export const BAT_NAMES = ['Mouse', 'Keys 1', 'Keys 2', 'Pad 1', 'Pad 2', 'Pad 3', 'Pad 4'];
 
+// ---- the world: x runs from WORLD.x0 (west) to WORLD.x1 (east), z from -WORLD.z to +WORLD.z ----
+export const WORLD = { x0: -22, x1: 16, z: 10.8 };
+
 // ---- streets: straight segments [x1, z1, x2, z2] plus the round plaza ----
 export const STREET_W = 1.3;
 export const PLAZA = { x: -2, z: 0, r: 2.6 };
 export const STREETS = [
-  [-15, -4.8, 8, -4.8],    // north lane
-  [-15, 4.8, 8, 4.8],      // south lane
-  [-15, -4.8, -15, 4.8],   // west lane
-  [-10, -4.8, -10, 4.8],   // church lane
-  [5, -4.8, 5, 4.8],       // east lane
-  [-15, 0, -4.6, 0],       // west road into the plaza
-  [0.6, 0, 10.5, 0],       // main road from the plaza to the castle gate
-  [-2, -8.5, -2, -2.6],    // north road
-  [-2, 2.6, -2, 8.5],      // south road
-  [-0.2, -1.8, 3.2, -4.8], // north-east alley
-  [-3.8, 1.8, -7.2, 4.8]   // south-west alley
+  [-20.5, -4.8, 8, -4.8],   // north lane
+  [-20.5, 4.8, 8, 4.8],     // south lane
+  [-20.5, -9.2, 5, -9.2],   // outer north street
+  [-20.5, 9.2, 5, 9.2],     // outer south street
+  [-20.5, -9.2, -20.5, 9.2], // far west lane (the new west district)
+  [-15, -4.8, -15, 4.8],    // west lane
+  [-10, -4.8, -10, 4.8],    // church lane
+  [5, -9.2, 5, 9.2],        // east lane
+  [-20.5, 0, -4.6, 0],      // west road into the plaza
+  [0.6, 0, 10.5, 0],        // main road from the plaza to the castle gate
+  [-2, -9.2, -2, -2.6],     // north road
+  [-2, 2.6, -2, 9.2],       // south road
+  [-0.2, -1.8, 3.2, -4.8],  // north-east alley
+  [-3.8, 1.8, -7.2, 4.8]    // south-west alley
 ];
 
-// ---- houses: centre, size, door direction (f), optional tall / church ----
+// ---- houses: centre, size, door direction (f), optional tall / church / mill ----
 export const HOUSES = [
-  // north row, doors face the north lane
+  // north row, between the north lane and the outer north street
+  { x: -17.8, z: -7.0, w: 2.2, d: 2.2, f: [0, 1], mill: true },
   { x: -13.2, z: -7.0, w: 3.0, d: 1.9, f: [0, 1] },
   { x: -9.3, z: -7.0, w: 2.6, d: 1.9, f: [0, 1], tall: true },
   { x: -5.4, z: -7.1, w: 3.2, d: 1.8, f: [0, 1] },
-  { x: 5.2, z: -7.0, w: 3.0, d: 1.9, f: [0, 1], tall: true },
-  // south row, doors face the south lane
+  { x: 7.3, z: -7.0, w: 3.0, d: 1.9, f: [0, 1], tall: true },
+  // south row, between the south lane and the outer south street
+  { x: -17.8, z: 7.0, w: 3.0, d: 1.9, f: [0, 1] },
   { x: -13.2, z: 7.0, w: 3.0, d: 1.9, f: [0, -1], tall: true },
-  { x: -9.0, z: 7.1, w: 2.4, d: 1.8, f: [0, -1] },
+  { x: -9.0, z: 7.1, w: 2.4, d: 1.8, f: [0, 1] },
   { x: -5.4, z: 7.0, w: 3.0, d: 1.9, f: [0, -1] },
-  { x: 1.6, z: 7.0, w: 3.0, d: 1.9, f: [0, -1], tall: true },
-  { x: 6.0, z: 7.1, w: 2.8, d: 1.8, f: [0, -1] },
+  { x: 1.6, z: 7.0, w: 3.0, d: 1.9, f: [0, 1], tall: true },
+  { x: 7.4, z: 7.0, w: 3.3, d: 2.1, f: [0, 1], jail: true },   // the jail (bottom right): caught bats are locked up here
   // middle of the village, doors face the east-west roads
+  { x: -17.8, z: -2.4, w: 3.0, d: 1.8, f: [0, 1], tall: true },
+  { x: -17.8, z: 2.4, w: 2.8, d: 1.8, f: [0, 1] },
   { x: -12.8, z: -2.4, w: 2.8, d: 1.8, f: [0, 1] },
   { x: -12.8, z: 2.4, w: 2.8, d: 1.8, f: [0, -1], tall: true },
   { x: -7.0, z: -2.5, w: 3.2, d: 2.1, f: [0, 1], church: true },
@@ -68,9 +89,9 @@ export const HOUSES = [
 
 // ---- watchmen patrol routes (on the streets) ----
 export const PATHS = [
-  [[-15, -4.8], [5, -4.8], [5, 4.8], [-15, 4.8]],               // the long outer round
-  [[-10, -4.8], [-2, -4.8], [-2, -2.6], [-4.6, 0], [-10, 0]],    // church and plaza (west)
-  [[5, 4.8], [-2, 4.8], [-2, 2.6], [0.6, 0], [5, 0]]             // night shift: plaza and main road (east)
+  [[-20.5, -9.2], [5, -9.2], [5, 9.2], [-20.5, 9.2]],                 // the long outer round
+  [[-15, -4.8], [-2, -4.8], [-2, -2.6], [-4.6, 0], [-15, 0], [-15, 4.8], [-20.5, 4.8], [-20.5, -4.8]], // west district, church and plaza
+  [[5, 4.8], [-2, 4.8], [-2, 2.6], [0.6, 0], [5, 0], [5, -4.8], [-0.2, -4.8]]  // night shift: plaza and main road (east)
 ];
 
 // ---- street lamps on timers: on for `on` seconds, then off for `off` seconds ----
@@ -78,11 +99,16 @@ export const LAMPS = [
   { x: -10, z: 0, on: 6, off: 4, offset: 0 },
   { x: 5, z: 0, on: 6, off: 4, offset: 5 },
   { x: -2, z: -4.8, on: 5, off: 5, offset: 2.5 },
-  { x: -2, z: 4.8, on: 5, off: 5, offset: 7.5 }
+  { x: -2, z: 4.8, on: 5, off: 5, offset: 7.5 },
+  { x: -20.5, z: 0, on: 5, off: 5, offset: 1.5 },
+  { x: -10, z: -9.2, on: 6, off: 5, offset: 4 },
+  { x: -10, z: 9.2, on: 6, off: 5, offset: 9 }
 ];
 
 // ---- decoration ----
-export const TREES = [[-15.3, -6.8], [-15.3, 6.8], [-11.0, 7.9], [3.85, 8.0],
-  [9.2, -7.5], [9.2, 7.5], [-4.4, -3.4], [-0.4, -3.5], [-3.2, 3.6]];
+export const TREES = [[-21.4, -10.2], [-21.4, 10.2], [-11.0, 7.9], [3.85, 8.0], [-4.4, -3.4], [-0.4, -3.5], [-3.2, 3.6],
+  [9.6, -5.9], [9.6, 6.0], [-15.6, -10.3], [-7.4, -10.4], [-0.6, -10.3], [6.5, -10.3], [-18.4, 10.3], [-11.5, 10.4], [-3.6, 10.4], [3.2, 10.3],
+  [11.2, -9.9], [13.4, -10.2], [15.4, -9.8], [11.4, 9.9], [13.6, 10.2], [15.5, 9.9], [-21.5, -4.0], [-21.5, 3.0], [-16.0, -1.0]];
 export const GRAVEYARD = { x: 1.6, z: -7.0, w: 3.2, d: 2.2 };
-export const STALLS = [{ x: -1.2, z: -1.65, color: '#F07A6A' }, { x: -2.8, z: 1.65, color: '#7FD6E0' }];
+export const FIELDS = [{ x: -9, z: -10.2, w: 4, d: 1.0 }, { x: -14.5, z: 10.25, w: 3.4, d: .9 }, { x: 0.8, z: 10.25, w: 3.2, d: .9 }]; // little garlic-free vegetable patches at the edge
+export const STALLS = [{ x: -0.9, z: -1.95, color: '#F07A6A' }, { x: -3.1, z: 1.95, color: '#7FD6E0' }];
