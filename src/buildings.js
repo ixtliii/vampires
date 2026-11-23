@@ -331,13 +331,13 @@ export function buildStreets(kit, streets, W, plaza, insideOther) {
       if (Math.random() > .38) continue;
       const x = x1 + ux * t + nx * o + rnd(-.05, .05), z = z1 + uz * t + nz * o + rnd(-.05, .05);
       if (Math.hypot(x - plaza.x, z - plaza.z) < plaza.r + .05) continue;
-      kit.box(rnd(.18, .28), .03, rnd(.15, .23), Math.random() < .5 ? '#4B4385' : '#3D3672', x, .055, z, 0, -ang + rnd(-.25, .25), 0, .06);
+      kit.box(rnd(.18, .28), .03, rnd(.15, .23), Math.random() < .5 ? '#6E64A8' : '#61589A', x, .055, z, 0, -ang + rnd(-.25, .25), 0, .06);
     }
     [-1, 1].forEach(sd => {
       for (let t = -W / 2 + .2; t < len + W / 2 - .1; t += .42) {
         const x = x1 + ux * t + nx * sd * (W / 2 + .04), z = z1 + uz * t + nz * sd * (W / 2 + .04);
         if (insideOther(x, z) || Math.hypot(x - plaza.x, z - plaza.z) < plaza.r + .15) continue;
-        kit.box(.38, .08, .13, '#6E6698', x, .06, z, 0, -ang, 0, .07);
+        kit.box(.38, .08, .13, '#948CC0', x, .06, z, 0, -ang, 0, .07);
       }
     });
   });

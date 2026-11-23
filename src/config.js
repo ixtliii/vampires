@@ -25,6 +25,8 @@ export const WATCH_SPEEDUP = 0.06;   // watchmen walk this much faster for every
 export const WATCH_SPEEDUP_MAX = 1.2; // ...up to this much faster
 export const CLAP_PUSH = 1;          // seconds each crowd clap pushes the sunrise back...
 export const CLAP_MAX = 20;          // ...up to this many seconds per night
+export const CLAP_CAGE = 1.5;        // while bats are in jail, each crowd clap takes this many seconds off their jail time
+export const FOURTH_WATCHMAN_AT = .6; // in 5-minute nights a fourth watchman joins after this share of the night
 export const CAGE_TIME = 20;         // a bat that loses its last heart sits in a cage this long, then gets out by itself...
 export const CAGE_LIVES = 1;         // ...with this many hearts
 export const RESCUE_R = 1.6;         // a teammate hovering this close to the cage...
@@ -91,7 +93,8 @@ export const HOUSES = [
 export const PATHS = [
   [[-20.5, -9.2], [5, -9.2], [5, 9.2], [-20.5, 9.2]],                 // the long outer round
   [[-15, -4.8], [-2, -4.8], [-2, -2.6], [-4.6, 0], [-15, 0], [-15, 4.8], [-20.5, 4.8], [-20.5, -4.8]], // west district, church and plaza
-  [[5, 4.8], [-2, 4.8], [-2, 2.6], [0.6, 0], [5, 0], [5, -4.8], [-0.2, -4.8]]  // night shift: plaza and main road (east)
+  [[5, 4.8], [-2, 4.8], [-2, 2.6], [0.6, 0], [5, 0], [5, -4.8], [-0.2, -4.8]], // night shift: plaza and main road (east)
+  [[-20.5, 9.2], [-2, 9.2], [-2, 4.8], [-10, 4.8], [-10, 0], [-15, 0], [-15, 4.8], [-20.5, 4.8]] // late shift (5-minute nights): the south-west
 ];
 
 // ---- street lamps on timers: on for `on` seconds, then off for `off` seconds ----
@@ -106,9 +109,9 @@ export const LAMPS = [
 ];
 
 // ---- decoration ----
-export const TREES = [[-21.4, -10.2], [-21.4, 10.2], [-11.0, 7.9], [3.85, 8.0], [-4.4, -3.4], [-0.4, -3.5], [-3.2, 3.6],
-  [9.6, -5.9], [9.6, 6.0], [-15.6, -10.3], [-7.4, -10.4], [-0.6, -10.3], [6.5, -10.3], [-18.4, 10.3], [-11.5, 10.4], [-3.6, 10.4], [3.2, 10.3],
-  [11.2, -9.9], [13.4, -10.2], [15.4, -9.8], [11.4, 9.9], [13.6, 10.2], [15.5, 9.9], [-21.5, -4.0], [-21.5, 3.0], [-16.0, -1.0]];
+export const TREES = [[-21.4, -10.2], [-21.4, 10.2], // only along the edges of the map: inside the village they hid streets and garlic
+  [-15.6, -10.3], [-7.4, -10.4], [-0.6, -10.3], [6.5, -10.3], [-18.4, 10.3], [-11.5, 10.4], [-3.6, 10.4], [3.2, 10.3],
+  [11.2, -9.9], [13.4, -10.2], [15.4, -9.8], [11.4, 9.9], [13.6, 10.2], [15.5, 9.9], [-21.5, -4.0], [-21.5, 3.0]];
 export const GRAVEYARD = { x: 1.6, z: -7.0, w: 3.2, d: 2.2 };
 export const FIELDS = [{ x: -9, z: -10.2, w: 4, d: 1.0 }, { x: -14.5, z: 10.25, w: 3.4, d: .9 }, { x: 0.8, z: 10.25, w: 3.2, d: .9 }]; // little garlic-free vegetable patches at the edge
 export const STALLS = [{ x: -0.9, z: -1.95, color: '#F07A6A' }, { x: -3.1, z: 1.95, color: '#7FD6E0' }];

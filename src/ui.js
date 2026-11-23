@@ -29,7 +29,7 @@ function CrowdOptions({ mic, setMic, sens, setSens, micStatus }) {
     msg ? h('p', { className: 'micmsg ' + msg[0], role: 'status' }, msg[1]) : null);
 }
 
-function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart, crowd, tut, setTut, painted, setPaintedStyle }) {
+function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart, crowd, tut, setTut, painted, setPaintedStyle, openPads }) {
   return h('div', { className: 'overlay' }, h(MenuBats), h('div', { className: 'card' },
     h('div', { className: 'options' },
       h(Seg, { label: t('language'), value: lang, onChange: changeLang, options: LANGS.map(l => ({ v: l.id, label: l.label, lang: l.id })) })),
@@ -48,7 +48,7 @@ function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound,
         h('tr', null, h('td', null, t('pad')), h('td', null, t('anyButton')), h('td', null, t('stick')), h('td', null, t('faceButton')), h('td', null, t('shoulder')))))),
     h('p', { className: 'note' }, t('note'), ' ', K('Esc'), ' ', t('escBack')),
     h('div', { className: 'options' },
-      h(Seg, { label: t('roundLength'), value: roundTime, onChange: setRoundTime, options: [{ v: 180, label: t('min3') }, { v: 90, label: t('sec90') }] }),
+      h(Seg, { label: t('roundLength'), value: roundTime, onChange: setRoundTime, options: [{ v: 300, label: t('min5') }, { v: 180, label: t('min3') }] }),
       h(Seg, { label: t('sound'), value: sound, onChange: setSound, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] }),
       h(Seg, { label: t('tutorial'), value: tut, onChange: setTut, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] }),
       h(Seg, { label: t('style'), value: painted, onChange: setPaintedStyle, options: [{ v: true, label: t('stylePainted') }, { v: false, label: t('styleClean') }] })),
@@ -56,6 +56,8 @@ function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound,
     error ? h('p', { className: 'note', style: { color: 'var(--coral)' } }, t('noRenderer')) : null,
     h('div', { className: 'actions' },
       h('button', { type: 'button', className: 'big', disabled: !ready, onClick: onStart, autoFocus: true }, ready ? t('start') : t('loading')),
+      ready ? h('button', { type: 'button', className: 'ghost', onClick: () => { const g = window.__vgh; if (g) g.joycons.request().then(openPads); } }, t('padConnect')) : null,
+      ready ? h('button', { type: 'button', className: 'ghost', onClick: openPads }, t('padCheck')) : null,
       h('p', { className: 'small' }, ready ? h(React.Fragment, null, t('orPress'), ' ', K('Enter'), ' ', t('orPad'), ` · ${t('renderer')}: `, backend) : t('preparing')))));
 }
 
@@ -67,7 +69,7 @@ function End({ r, onAgain, onMenu }) {
     h('div', { className: 'stars', role: 'img', 'aria-label': t('starsLabel', { n: stars }) }, [0, 1, 2].map(i => h(Icon, { key: i, name: 'star', className: 'bigstar' + (i < stars ? ' on' : ''), style: null }))),
     h('p', { className: 'quote' }, t(r.win ? 'winQuote' : 'loseQuote', { n: r.burned, bulbs })),
     h('div', { className: 'stats' },
-      [['flame', r.burned, t('statBurned')], ['star', r.golden, t('statGolden')], ['alert', r.caught, t('statCaught')], ['ghost', r.dusted, t('statDust')]].map(([ic, v, l], i) => h('div', { className: 'stat', key: l, style: { '--d': `${.5 + i * .12}s` } }, h(Icon, { name: ic, className: 'stat-ic' }), h('b', null, v), h('span', null, l)))),
+      [['flame', r.burned, t('statBurned')], ['alert', r.caught, t('statCaught')], ['ghost', r.dusted, t('statDust')]].map(([ic, v, l], i) => h('div', { className: 'stat', key: l, style: { '--d': `${.5 + i * .12}s` } }, h(Icon, { name: ic, className: 'stat-ic' }), h('b', null, v), h('span', null, l)))),
     h('p', { className: 'small' }, r.isBest ? t('newBest') : t('best', { n: r.best })),
     h('div', { className: 'actions' },
       h('button', { type: 'button', className: 'big', onClick: onAgain, autoFocus: true }, t('again')),
@@ -98,6 +100,34 @@ function Tutorial({ tu }) {
     h('h3', { key: 'c' + tu.step, className: 'tut-cap' }, t('tut' + tu.step)),
     h('div', { className: 'tut-dots' }, TUT_SCENES.map((_, i) => h('i', { key: i, className: i < tu.step ? 'done' : i === tu.step ? 'on' : '' }, i === tu.step ? h('b', { key: 'b' + tu.step, style: { animationDuration: TUT_DUR + "s" } }) : null))),
     h('p', { className: 'tut-skip' }, t('tutSkip'))));
+}
+// controller check: shows what Chrome sees and which bat each controller drives
+function PadCheck({ game, onClose, upright, setUpright }) {
+  const [, tick] = useState(0), [msg, setMsg] = useState('');
+  const connect = async () => { const r = await game.joycons.request(); setMsg(r === 'unsupported' ? t('padNoHid') : ''); };
+  useEffect(() => { game.padCheckOpen = true; const id = setInterval(() => tick(n => n + 1), 80); return () => { clearInterval(id); game.padCheckOpen = false; }; }, [game]);
+  const players = game.padPlayers || [], state = game.padState || [];
+  let raw = []; try { raw = Array.from(navigator.getGamepads ? navigator.getGamepads() : []).filter(Boolean); } catch (e) {}
+  return h('div', { className: 'overlay padcheck-wrap' }, h('div', { className: 'card padcheck', role: 'dialog', 'aria-label': t('padCheck') },
+    h('h2', null, t('padCheck')),
+    h('p', { className: 'note' }, t('padHint')),
+    h('div', { className: 'actions' }, h('button', { type: 'button', className: 'ghost', onClick: connect }, t('padConnect')), h('span', { className: 'small' }, game.joycons.supported ? t('padConnectHint') : t('padNoHid'))),
+    msg ? h('p', { className: 'micmsg bad' }, msg) : null,
+    h('div', { className: 'pc-list' }, [0, 1, 2, 3].map(i => {
+      const p = players[i], st = state[i], bat = game.bats[3 + i];
+      return h('div', { key: i, className: 'pc-row' + (p ? '' : ' empty') },
+        h('span', { className: 'chip-bat', style: { color: bat ? bat.color : '#888' }, dangerouslySetInnerHTML: { __html: ICONS.bat } }),
+        h('b', null, batName(3 + i)),
+        h('div', { className: 'pc-stick' }, h('i', { style: st ? { left: `${50 + st.ax * 40}%`, top: `${50 + st.ay * 40}%` } : null })),
+        p && p.hid ? h('span', { className: 'pc-id' }, `${t(p.hid.side === 'L' ? 'padLeftHalf' : p.hid.side === 'R' ? 'padRightHalf' : 'padPro')} · ${t('padLight', { n: p.hid.light })}`,
+          h('span', { className: 'pc-shake' + (performance.now() - p.hid.shakeAt < 700 ? ' hit' : '') }, h('i', { style: { transform: `scaleX(${(st && st.motion || 0).toFixed(2)})` } })),
+          performance.now() - p.hid.shakeAt < 700 ? h('b', { className: 'pc-shook' }, t('padShaken')) : null) :
+        h('span', { className: 'pc-id' }, p ? `${p.half ? (p.half === 'L' ? t('padLeftHalf') : t('padRightHalf')) + ' · ' : ''}${p.gp.id.replace(/\s*\(.*?Vendor.*\)/i, '')}` : t('padNone')),
+        h('span', { className: 'pc-btns' }, st && st.pressed.length ? st.pressed.join(' ') : ''));
+    })),
+    h('p', { className: 'small' }, t('padRaw', { n: raw.length }), ' ', raw.map(g => `#${g.index}: ${g.id.slice(0, 40)}`).join(' | ')),
+    h('div', { className: 'options' }, h(Seg, { label: t('padHeld'), value: upright, onChange: setUpright, options: [{ v: false, label: t('padSideways') }, { v: true, label: t('padUpright') }] })),
+    h('div', { className: 'actions' }, h('button', { type: 'button', className: 'big', onClick: onClose, autoFocus: true }, t('padDone')))));
 }
 // a few bats flapping across the menu
 function MenuBats() {
@@ -138,7 +168,7 @@ function SunFrame({ progress, started, clapping }) {
   }
   const col = progress < .5 ? mix('#5B6BD8', '#B65FB8', progress * 2) : mix('#B65FB8', '#F79A55', (progress - .5) * 2);
   const late = progress > .86;
-  return h('div', { className: 'sunframe' + (late ? ' late' : '') + (clapping ? ' rewind' : ''), 'aria-hidden': 'true',
+  return h('div', { className: 'sunframe' + (late ? ' late' : '') + '', 'aria-hidden': 'true',
     style: { boxShadow: `inset 0 0 ${40 + progress * 120}px rgba(247,154,85,${(progress * progress * .45).toFixed(3)})` } },
     h('svg', { viewBox: `0 0 ${W} ${H}` },
       h('path', { className: 'track', d }),
@@ -165,9 +195,7 @@ function ClapMeter({ game, hud }) {
   return h('div', { ref: root, className: 'clap', role: 'group', 'aria-label': t('clapLabel') },
     h('div', { className: 'meter', hidden: !mic }, h('i', { ref: fill }), h('u', { ref: thr })),
     h('div', { className: 'side' },
-      h('span', { className: 'lbl' }, t('clapLeft', { n: Math.round(hud.clapLeft) })),
-      h('button', { type: 'button', title: t('clapBtn') + ' (C)', 'aria-label': t('clapBtn'), onPointerDown: e => { e.preventDefault(); game && game.clap('button'); }, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); game && game.clap('button'); } }, dangerouslySetInnerHTML: { __html: ICONS.clap } }),
-      h('div', { className: 'boost' }, h('i', { ref: boost }))));
+      h('button', { type: 'button', title: t('clapBtn') + ' (C)', 'aria-label': t('clapBtn'), onPointerDown: e => { e.preventDefault(); game && game.clap('button'); }, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); game && game.clap('button'); } }, dangerouslySetInnerHTML: { __html: ICONS.clap } })));
 }
 
 function Hud({ hud, game }) {
@@ -188,6 +216,7 @@ function Hud({ hud, game }) {
       h('span', { className: 'hp', 'aria-label': t('livesLabel', { n: p.lives }) }, [0, 1, 2].map(i => i < p.lives ? h('span', { key: i }, '♥') : h('s', { key: i }, '♥'))),
       p.caged ? h('span', { className: 'ec caged' }, t('chipCaged', { n: p.cageLeft })) : p.out ? ` ${t('chipOut')}` : p.napping ? h('span', { className: 'ec' }, 'zzz') : p.awake ? h('span', { className: 'ec' + (p.echoLocked ? ' locked' : p.echo ? '' : ' ready') }, p.echo ? t('chipEcho', { n: p.echo }) : t('chipEchoReady')) : ` ${t('chipAsleep')}`,
       p.carrying ? ` · ${t('chipGarlic')}` : null))),
+    hud.jailed > 0 && hud.state === 'play' ? h('div', { className: 'clap-jail', role: 'status' }, h(Icon, { name: 'clap' }), t('clapJail', { n: hud.jailed })) : null,
     h(ClapMeter, { game, hud }),
     h('div', { className: 'badge' }, hud.backend));
 }
@@ -197,7 +226,7 @@ function App() {
   const [screen, setScreen] = useState('menu');
   const [ready, setReady] = useState(false), [backend, setBackend] = useState(''), [error, setError] = useState(false);
   const [hud, setHud] = useState(null), [result, setResult] = useState(null);
-  const [roundTime, setRoundTime] = useState(180), [sound, setSound] = useState(true);
+  const [roundTime, setRoundTime] = useState(300), [sound, setSound] = useState(true);
   const [lang, setLangState] = useState(getLang());
   const [mic, setMicMode] = useState('off'), [sens, setSensState] = useState('medium'), [micStatus, setMicStatus] = useState('off');
   const setMic = async v => {
@@ -206,6 +235,8 @@ function App() {
     setMicStatus('starting'); setMicStatus(await g.clapper.enable());
   };
   const [tut, setTutState] = useState(true);
+  const [padCheck, setPadCheck] = useState(false), [upright, setUprightState] = useState(false);
+  const setUpright = v => { setUprightState(v); if (gameRef.current) gameRef.current.padUpright = v; };
   const [painted, setPaintedState] = useState(!new URLSearchParams(location.search).has('clean'));
   const setPaintedStyle = v => { setPaintedState(v); if (gameRef.current) gameRef.current.setStyle(v); };
   const setTut = v => { setTutState(v); if (gameRef.current) gameRef.current.tutorialOn = v; };
@@ -227,7 +258,8 @@ function App() {
     painted ? h('div', { className: 'grain', 'aria-hidden': 'true' }) : null,
     h('div', { ref: layerRef, className: 'layer', 'aria-hidden': 'true' }),
     screen !== 'menu' && screen !== 'end' ? h(Hud, { hud, game: gameRef.current }) : null,
-    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start, crowd: { mic, setMic, sens, setSens, micStatus }, tut, setTut, painted, setPaintedStyle }) : null,
+    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start, crowd: { mic, setMic, sens, setSens, micStatus }, tut, setTut, painted, setPaintedStyle, openPads: () => setPadCheck(true) }) : null,
+    screen === 'menu' && padCheck && gameRef.current ? h(PadCheck, { game: gameRef.current, onClose: () => setPadCheck(false), upright, setUpright }) : null,
     screen === 'end' && result ? h(End, { r: result, onAgain: start, onMenu: () => gameRef.current.toMenu() }) : null);
 }
 

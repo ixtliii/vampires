@@ -10,10 +10,11 @@ import { Sound } from './audio.js';
 import { t as tr, batName } from './i18n.js';
 import { ICONS } from './icons.js';
 import { ClapDetector } from './clap.js';
+import { JoyConHub } from './joycon.js';
 import { Kit, buildCottage, buildChurch, buildMill, buildMillSails, buildField, buildGarlicGeometry, buildStreets, buildPlaza, buildTree, buildGraveyard, buildStall, buildLampPost, buildScatter, buildCastle as buildCastleKit, garlicFromModel, buildJail } from './buildings.js';
 import {
   CASTLE_X, FURNACE, FLY_Y, GRAB_TIME, GRAB_R, MAXV, CARRY_V, ECHO_CD, ECHO_DUR, IDLE_SLEEP,
-  LIGHT_R0, LIGHT_R1, NOTICE, LAMP_R, LAMP_SLOW, NAP_TIME, PASS_R, WATCH_SPEEDUP, WATCH_SPEEDUP_MAX, CLAP_PUSH, CLAP_MAX, CAGE_TIME, CAGE_LIVES, RESCUE_R, RESCUE_TIME, RESCUE_LIVES, THIRD_WATCHMAN_AT, ROOF_COLORS, BAT_COLORS,
+  LIGHT_R0, LIGHT_R1, NOTICE, LAMP_R, LAMP_SLOW, NAP_TIME, PASS_R, WATCH_SPEEDUP, WATCH_SPEEDUP_MAX, CLAP_PUSH, CLAP_MAX, CAGE_TIME, CLAP_CAGE, FOURTH_WATCHMAN_AT, CAGE_LIVES, RESCUE_R, RESCUE_TIME, RESCUE_LIVES, THIRD_WATCHMAN_AT, ROOF_COLORS, BAT_COLORS,
   STREET_W, PLAZA, STREETS, HOUSES, PATHS, LAMPS, TREES, GRAVEYARD, STALLS, FIELDS, WORLD
 } from './config.js';
 
@@ -23,10 +24,10 @@ const d2 = (ax, az, bx, bz) => Math.hypot(ax - bx, az - bz);
 const rand = (a, b) => a + Math.random() * (b - a);
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 // sky / light colours through the night (p = share of the night that has passed)
-const SKY_KEYS = [
-  { p: 0,   bg: '#2A1850', sky: '#8A6AD0', gnd: '#2E1840', hi: 1.4,  key: '#D0A8FF', ki: 1.3, pos: [-20, 9, 5],  moon: '#A07CFF', glow: .55 },  // dusk: violet
-  { p: .35, bg: '#05051A', sky: '#2E3488', gnd: '#0E0820', hi: .8,   key: '#8FA8FF', ki: 1.0, pos: [-2, 22, 3],  moon: '#6C84FF', glow: .6 },   // midnight: cold blue, moon overhead
-  { p: .68, bg: '#4A2458', sky: '#A060B0', gnd: '#40203E', hi: 1.35, key: '#F0A0C8', ki: 1.6, pos: [14, 12, 4],  moon: '#D090D8', glow: .45 },  // pre-dawn: pink
+const SKY_KEYS = [ // brighter than a real night on purpose: a projector turns dark blue into black
+  { p: 0,   bg: '#2A1850', sky: '#9A80E0', gnd: '#3A2850', hi: 1.6,  key: '#D8B8FF', ki: 1.4, pos: [-20, 9, 5],  moon: '#A890FF', glow: .5 },   // dusk: violet
+  { p: .35, bg: '#0C0C28', sky: '#5A64C0', gnd: '#241A40', hi: 1.35, key: '#A8BCFF', ki: 1.35, pos: [-2, 22, 3], moon: '#8098FF', glow: .5 },   // midnight: cool blue, moon overhead
+  { p: .68, bg: '#4A2458', sky: '#B070C0', gnd: '#4A2A48', hi: 1.55, key: '#F0A8D0', ki: 1.7, pos: [14, 12, 4],  moon: '#D498DC', glow: .4 },   // pre-dawn: pink
   { p: .86, bg: '#C85A55', sky: '#F8A880', gnd: '#5E3A40', hi: 1.9,  key: '#FF8A48', ki: 3.0, pos: [24, 4.5, 3], moon: '#FFA070', glow: .25 },  // dawn: low orange sun, long shadows
   { p: 1,   bg: '#F7B474', sky: '#FFE6C0', gnd: '#806050', hi: 2.4,  key: '#FFD394', ki: 3.6, pos: [22, 10, 4],  moon: '#FFD8A8', glow: .12 }   // sunrise: golden
 ];
@@ -53,9 +54,10 @@ export class Game {
   constructor(canvas, layer, cb) {
     this.canvas = canvas; this.layer = layer; this.cb = cb;
     this.sound = new Sound();
-    this.state = 'menu'; this.time = 0; this.roundTime = 180;
+    this.state = 'menu'; this.time = 0; this.roundTime = 300;
     this.keys = new Set(); this.mouse = { x: 0, z: 0, last: -10, ndc: new THREE.Vector2() };
-    this.prevPad = []; this.floats = []; this.parts = [];
+    this.joycons = new JoyConHub(); this.joycons.init();
+    this.prevPad = []; this.prevPadKey = []; this.padPlayers = []; this.padUpright = false; this.floats = []; this.parts = [];
     this.hudT = 0; this.endTimer = 0; this.banner = null; this.dt = 1 / 60;
     this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._v = new THREE.Vector3(); // scratch objects for posing bones
     this.clapper = new ClapDetector(); this.clapUI = null; this.clapFlash = 0; this.clapBoost = 0;
@@ -164,9 +166,8 @@ export class Game {
     s.add(new THREE.Mesh(this.glowKit.merge(), new THREE.MeshBasicMaterial({ vertexColors: true })));
     this.buildAmbience();
 
-    // garlic spots: one at every door, plus 3 hidden golden ones behind houses
+    // garlic spots: one at every door
     this.spots = this.houses.map(hh => this.makeSpot(hh.spot[0], hh.spot[1], false));
-    for (let i = 0; i < 3; i++) this.spots.push(this.makeSpot(0, 0, true));
 
     this.watchmen = PATHS.map(p => this.makeWatchman(p));
     this.cat = this.makeCat();
@@ -216,19 +217,19 @@ export class Game {
   }
   buildGround() {
     const s = this.scene, std = this.std;
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), std('#231E4A', { roughness: 1 }));
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), std('#283A58', { roughness: 1 })); // blue-teal grass: darker than the roads, different from the purple houses
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; s.add(ground);
     // grass tufts for texture
-    const tuft = new THREE.InstancedMesh(new THREE.ConeGeometry(.06, .22, 4), std('#2E5A52', { roughness: 1 }), 900);
+    const tuft = new THREE.InstancedMesh(new THREE.ConeGeometry(.06, .22, 4), std('#3A6A62', { roughness: 1 }), 350);
     const m = new THREE.Matrix4(); let k = 0;
-    for (let i = 0; i < 5000 && k < 900; i++) {
+    for (let i = 0; i < 5000 && k < 350; i++) {
       const x = rand(WORLD.x0 + .2, CASTLE_X - .3), z = rand(-WORLD.z + .2, WORLD.z - .2);
       if (this.onStreet(x, z, .5) || this.inHouse(x, z, .3)) continue;
       m.makeTranslation(x, .11, z); tuft.setMatrixAt(k++, m);
     }
     tuft.count = k; s.add(tuft);
     // streets
-    const streetMat = std('#332D66', { roughness: 1 });
+    const streetMat = std('#544A8C', { roughness: 1 });
     STREETS.forEach(([x1, z1, x2, z2], i) => {
       const len = Math.hypot(x2 - x1, z2 - z1), ang = Math.atan2(z2 - z1, x2 - x1);
       const st = new THREE.Mesh(new THREE.BoxGeometry(len + STREET_W, .04, STREET_W), streetMat);
@@ -324,7 +325,6 @@ export class Game {
       const occ = new THREE.Mesh(new THREE.BoxGeometry(hd.mill ? 2 : w, hgt, hd.mill ? 2 : d), occMat); occ.position.set(x, hgt / 2, z); occ.rotation.y = ry; occ.updateMatrixWorld(true);
       this.occluders.push(occ);
       if (hd.church) { const tw = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 1), occMat); tw.position.copy(toWorld(-w / 2 + .5, 2.5, d / 2 - .5)); tw.updateMatrixWorld(true); this.occluders.push(tw); }
-      const glow = this.glowDisc('#FFC870', .3); glow.scale.setScalar(2.6); glow.position.copy(toWorld(0, .06, (hd.mill ? 1.1 : d / 2) + .9)); s.add(glow);
       const off = (hd.mill ? 1.25 : d / 2) + .72, perp = [f[1], -f[0]];
       this.houses.push({ ...hd, spot: [x + f[0] * off, z + f[1] * off], back: [[x - f[0] * off + perp[0] * w * .3, z - f[1] * off + perp[1] * w * .3], [x - f[0] * off - perp[0] * w * .3, z - f[1] * off - perp[1] * w * .3]] });
     });
@@ -356,7 +356,7 @@ export class Game {
       if (FIELDS.some(f => Math.abs(x - f.x) < f.w / 2 + .3 && Math.abs(z - f.z) < f.d / 2 + .3)) return null;
       return [x, z];
     };
-    buildScatter(this.props, free, 170);
+    // (no rocks / mushrooms / flowers in the grass: they cluttered the picture on a projector)
   }
   buildCastle() {
     const s = this.scene;
@@ -412,9 +412,9 @@ export class Game {
       buildLampPost(this.lampKit, L);
       const headMat = new THREE.MeshBasicMaterial({ color: '#FFE9A8' });
       const head = new THREE.Mesh(new THREE.CylinderGeometry(.12, .15, .3, 8), headMat); head.position.set(L.x, 2.36, L.z); s.add(head);
-      const pool = this.glowDisc('#E8D6A0', .26); pool.scale.setScalar(LAMP_R * 2.3); pool.position.set(L.x, .16, L.z); s.add(pool);
+      const pool = this.glowDisc('#E8E0C8', .16); pool.scale.setScalar(LAMP_R * 2.0); pool.position.set(L.x, .16, L.z); s.add(pool);
       const ring = this.softRing('#FFE9A8', .55); ring.scale.setScalar(LAMP_R); ring.position.set(L.x, .17, L.z); s.add(ring);
-      const light = new THREE.PointLight('#FFE3A0', 5, 6, 2); light.position.set(L.x, 2.1, L.z); s.add(light); // dimmer than a watchman's lantern
+      const light = new THREE.PointLight('#F2E6C8', 2.5, 4.5, 2); light.position.set(L.x, 2.1, L.z); s.add(light); // pale and much dimmer than a watchman's lantern
       return { x: L.x, z: L.z, offset: L.offset, onDur: L.on, offDur: L.off, head, headMat, pool, ring, light, onNow: false, warn: false };
     });
   }
@@ -432,7 +432,7 @@ export class Game {
     // chimney smoke: soft puffs that rise, grow and fade
     this.smokeSrc = this.chimneyTops;
     const PUFFS = 5;
-    this.smoke = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#A79DD6', map: this.glowTex, transparent: true, opacity: .4, depthWrite: false }), this.smokeSrc.length * PUFFS);
+    this.smoke = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#A79DD6', map: this.glowTex, transparent: true, opacity: .2, depthWrite: false }), this.smokeSrc.length * PUFFS);
     this.smoke.frustumCulled = false; s.add(this.smoke);
     this.smokePuffs = [];
     this.smokeSrc.forEach((src, i) => { for (let k = 0; k < PUFFS; k++) this.smokePuffs.push({ src, ph: k / PUFFS + i * .37 }); });
@@ -440,13 +440,13 @@ export class Game {
     // camera-facing glow cards (fireflies, wisps): one instanced mesh
     this.fireflies = [];
     const homes = [...TREES, [GRAVEYARD.x, GRAVEYARD.z], [GRAVEYARD.x - 1, GRAVEYARD.z], ...FIELDS.map(fl => [fl.x, fl.z]), [-9, -6], [-4, 6], [8.5, 6.5], [8.5, -6.5]];
-    for (let i = 0; i < 70; i++) { const [hx, hz] = homes[i % homes.length]; this.fireflies.push({ hx: hx + rand(-1.2, 1.2), hz: hz + rand(-1.2, 1.2), hy: rand(.4, 1.6), ph: rand(0, 20), sp: rand(.3, .8) }); }
+    for (let i = 0; i < 24; i++) { const [hx, hz] = homes[i % homes.length]; this.fireflies.push({ hx: hx + rand(-1.2, 1.2), hz: hz + rand(-1.2, 1.2), hy: rand(.4, 1.6), ph: rand(0, 20), sp: rand(.3, .8) }); }
     this.ffMesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(.42, .42), glowMat('#E6FF7A', 1), this.fireflies.length);
     this.ffMesh.frustumCulled = false; s.add(this.ffMesh);
 
     // ground mist drifting across the village
     this.mist = [];
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 0; i++) { // ground mist switched off: it greyed out the streets when projected
       const m = this.glowDisc('#7E70C8', .16); m.scale.setScalar(rand(6, 10)); m.position.set(rand(WORLD.x0, 10), .15 + i * .01, rand(-WORLD.z + 1, WORLD.z - 1)); s.add(m);
       this.mist.push({ m, sp: rand(.15, .35), base: .16 });
     }
@@ -552,7 +552,7 @@ export class Game {
     });
 
     // lamp cones follow their lamp
-    this.lamps.forEach(L => { const on = L.onNow, blink = L.warn && Math.floor(t * 8) % 2 === 0; L.cone.visible = on || blink; L.cone.material.opacity = on ? .05 * (.6 + .4 * night) : .02; });
+    this.lamps.forEach(L => { const on = L.onNow, blink = L.warn && Math.floor(t * 8) % 2 === 0; L.cone.visible = on || blink; L.cone.material.opacity = on ? .03 * (.6 + .4 * night) : .01; });
 
     // castle flags wave
     this.flags.forEach(f => {
@@ -586,7 +586,7 @@ export class Game {
     const bulbs = offs.map(([ox, oz]) => { const m = this.makeGarlic(golden); m.position.set(ox, 0, oz); group.add(m); return m; });
     let glow = null, halo = null;
     if (golden) { glow = this.glowDisc('#FFD84A', .9); glow.scale.setScalar(2.2); glow.position.y = .08; group.add(glow); }
-    else { halo = this.glowDisc('#FFF1C2', .55); halo.scale.setScalar(2.4); halo.position.set(x, .15, z); this.scene.add(halo); }
+    else { halo = this.glowDisc('#DDEBFF', .4); halo.scale.setScalar(1.6); halo.position.set(x, .15, z); this.scene.add(halo); }
     this.scene.add(group);
     return { x, z, count: 1, golden, revealT: 0, group, bulbs, glow, halo, ph: Math.random() * 6 };
   }
@@ -789,9 +789,9 @@ export class Game {
     const lantern = m.getObjectByName('Lantern'), palm = rig.bone('palm.L');
     const light = new THREE.PointLight('#FFD27A', 12, 7, 2); light.position.set(.2, .55, -.85); g.add(light); // out in front, so it lights the street, not his coat
     this.scene.add(g);
-    const pool = this.glowDisc('#FFD98A', .75); pool.position.y = .16; this.scene.add(pool);
+    const pool = this.glowDisc('#FFC85A', .9); pool.position.y = .16; this.scene.add(pool);
     const rg = new THREE.RingGeometry(.95, 1, 48); rg.rotateX(-Math.PI / 2);
-    const ring = this.softRing('#FFE08A', .7); ring.position.y = .17; this.scene.add(ring);
+    const ring = this.softRing('#FFD060', .9); ring.position.y = .17; this.scene.add(ring);
     return { path, g, pool, ring, light, rig, model: m, lantern, palm, x: path[0][0], z: path[0][1], seg: 1, mode: 'patrol', pause: 0, chaseT: 0, chaseBat: null, inv: null, angle: 0, alertT: 0, active: false };
   }
   // walk cycle on the hunter's bones (all angles in model space: +z = his front, +x = his left)
@@ -1011,28 +1011,71 @@ export class Game {
     window.addEventListener('blur', () => this.keys.clear());
     window.addEventListener('gamepadconnected', e => { if (this.state === 'play') this.showBanner(tr('padConnected', { n: e.gamepad.index + 1 }), 3, '#9FE0C9', 'sparkle'); });
   }
-  readPads() {
+  // ---------------------------------------------------------------------
+  // controllers -> players. Chrome on a Mac merges a left + right Joy-Con into ONE "Joy-Con L+R" gamepad,
+  // as if they were clipped onto a Switch. We split that back into two players: the left half drives one bat,
+  // the right half another. A single Joy-Con, or any other gamepad, is one player.
+  // padHalf: which buttons / stick belong to each half (standard gamepad mapping)
+  // ---------------------------------------------------------------------
+  padPlayersNow() {
     let pads = [];
-    try { pads = navigator.getGamepads ? Array.from(navigator.getGamepads()) : []; } catch (e) { pads = []; }
+    try { pads = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : []; } catch (e) { pads = []; }
+    pads.sort((a, b) => a.index - b.index);
+    const players = [];
+    pads.forEach(gp => {
+      const combined = /L\s*\+\s*R|L\/R|\b200e\b/i.test(gp.id) && gp.axes.length >= 4;
+      if (combined) { players.push({ gp, half: 'L' }); players.push({ gp, half: 'R' }); }
+      else players.push({ gp, half: null });
+    });
+    return players.slice(0, 4);
+  }
+  readPads() {
+    // Joy-Cons connected directly (WebHID) come first, one Joy-Con = one bat, in the order they were connected.
+    // Then other gamepads (Xbox, PlayStation...). Nintendo entries from the normal gamepad list are skipped while
+    // Joy-Cons are connected directly, so a Joy-Con never drives two bats.
+    const hid = this.joycons.read(this.padUpright);
+    const players = [...hid.map(st => ({ hid: st })), ...this.padPlayersNow().filter(p => !(hid.length && /057e|Joy-Con|Pro Controller/i.test(p.gp.id)))].slice(0, 4);
+    this.padPlayers = players;
+    const LEFT_BTNS = [4, 6, 8, 10, 12, 13, 14, 15], RIGHT_BTNS = [0, 1, 2, 3, 5, 7, 9, 11];
     const out = [];
     for (let i = 0; i < 4; i++) {
-      const gp = pads[i];
-      if (!gp) { out.push(null); this.prevPad[i] = []; continue; }
+      const p = players[i];
+      if (!p) { out.push(null); this.prevPad[i] = []; continue; }
+      if (p.hid) { out.push(p.hid); this.prevPadKey[i] = 'hid' + i; continue; }
+      const gp = p.gp, key = gp.index + (p.half || '');
+      if (this.prevPadKey[i] !== key) { this.prevPad[i] = gp.buttons.map(b => b.pressed); this.prevPadKey[i] = key; } // new controller in this seat: no fake presses
       const pressed = gp.buttons.map(b => b.pressed), prev = this.prevPad[i] || [];
-      const edges = pressed.map((p, j) => p && !prev[j]); this.prevPad[i] = pressed;
-      let ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;
-      if (Math.hypot(ax, ay) < .2 && gp.axes.length > 3) { ax = gp.axes[2] || 0; ay = gp.axes[3] || 0; }
-      if (pressed[12]) ay = -1; if (pressed[13]) ay = 1; if (pressed[14]) ax = -1; if (pressed[15]) ax = 1;
+      const edge = j => !!pressed[j] && !prev[j]; this.prevPad[i] = pressed;
+      let ax, ay, echo, pass, any;
+      if (p.half) {
+        // one half of a merged pair. Kids hold each Joy-Con sideways, so turn the stick a quarter turn
+        const L = p.half === 'L', rx = gp.axes[L ? 0 : 2] || 0, ry = gp.axes[L ? 1 : 3] || 0;
+        if (this.padUpright) { ax = rx; ay = ry; }
+        else if (L) { ax = ry; ay = -rx; } else { ax = -ry; ay = rx; }
+        const mine = L ? LEFT_BTNS : RIGHT_BTNS;
+        echo = L ? [12, 13, 14, 15].some(edge) : [0, 1, 2, 3].some(edge);
+        pass = L ? [4, 6].some(edge) : [5, 7].some(edge);
+        any = mine.some(edge);
+      } else {
+        // a single controller: the left stick only (no fallback to the right stick, so two sticks never share a bat)
+        ax = gp.axes[0] || 0; ay = gp.axes[1] || 0;
+        if (pressed[12]) ay = -1; if (pressed[13]) ay = 1; if (pressed[14]) ax = -1; if (pressed[15]) ax = 1;
+        echo = [0, 1, 2, 3].some(edge); pass = [4, 5, 6, 7].some(edge); any = pressed.some((x, j) => edge(j));
+      }
       const m = Math.hypot(ax, ay); if (m < .2) { ax = 0; ay = 0; } else if (m > 1) { ax /= m; ay /= m; }
-      out.push({ ax, ay, edges, any: edges.some(Boolean) });
+      const own = p.half ? (p.half === 'L' ? LEFT_BTNS : RIGHT_BTNS) : null;
+      out.push({ ax, ay, echo, pass, any, pressed: pressed.map((x, j) => x && (!own || own.includes(j)) ? j : -1).filter(j => j >= 0) });
     }
+    this.padState = out;
     return out;
   }
-  padConnected(i) { try { return !!(navigator.getGamepads && navigator.getGamepads()[i]); } catch (e) { return false; } }
+  padConnected(i) { return !!(this.padPlayers && this.padPlayers[i]); }
   rumble(b, dur, weak, strong) {
     if (b.slot < 3) return;
     try {
-      const gp = navigator.getGamepads ? navigator.getGamepads()[b.slot - 3] : null, a = gp && gp.vibrationActuator;
+      const p = this.padPlayers && this.padPlayers[b.slot - 3];
+      if (p && p.hid) { this.joycons.rumble(b.slot - 3, dur, Math.max(weak, strong)); return; }
+      const gp = p && p.gp, a = gp && gp.vibrationActuator;
       if (a && a.playEffect) a.playEffect('dual-rumble', { duration: dur * 1000, weakMagnitude: weak, strongMagnitude: strong }).catch(() => {});
     } catch (e) { /* rumble not available */ }
   }
@@ -1057,9 +1100,11 @@ export class Game {
     this.flyers.forEach(f => { f.active = false; f.g.visible = f.gold.visible = false; });
     const normal = this.spots.filter(s => !s.golden);
     normal.forEach(s => { s.count = 0; s.revealT = 0; });
-    shuffle(normal.slice()).slice(0, START_GARLIC).forEach(s => { s.count = 1; });
-    const slots = shuffle(this.houses.map(hh => hh.back[Math.random() < .5 ? 0 : 1]).filter(([x, z]) => !this.onStreet(x, z, .2) && !this.inHouse(x, z, .1) && Math.abs(z) < WORLD.z - .6)).slice(0, 3);
-    this.spots.filter(s => s.golden).forEach((s, i) => { const sl = slots[i] || [-14, -8]; s.x = sl[0]; s.z = sl[1]; s.group.position.set(s.x, 0, s.z); s.count = 1; s.revealT = 0; });
+    // garlic scales with the length of the night: 10 bulbs for 3 minutes, 17 for 5 minutes
+    let n = this.garlicFor(START_GARLIC);
+    for (const s of shuffle(normal.slice())) { if (n <= 0) break; s.count = 1; n--; }
+    while (n > 0) { normal[n % normal.length].count++; n--; }
+    this.lateShiftDone = false;
     this.watchmen.forEach((w, i) => Object.assign(w, { x: w.path[0][0], z: w.path[0][1], seg: 1, mode: 'patrol', pause: i * .8, chaseT: 0, chaseBat: null, inv: null, alertT: 0, active: i < 2, prisoner: null, route: null }));
     if (this.jail) this.jail.rescueT = 0;
     Object.assign(this.cat, { x: -13, z: -4.8, tx: -13, tz: -4.8, pause: 1, cd: 0 });
@@ -1121,8 +1166,9 @@ export class Game {
       if (this.tutorialOn) { this.tutorial = { step: 0, t: 0 }; this.banner = null; }
     }
     const n = this.activeBats().length;
-    if (n > this.maxActive) { if (n >= 2) this.moreGarlic(GARLIC_PER_EXTRA_BAT); this.maxActive = n; }
+    if (n > this.maxActive) { if (n >= 2) this.moreGarlic(this.garlicFor(GARLIC_PER_EXTRA_BAT)); this.maxActive = n; }
   }
+  garlicFor(base) { return Math.round(base * Math.max(.5, this.roundTime / 180)); } // more garlic in longer nights
   moreGarlic(n) {
     const normal = this.spots.filter(s => !s.golden);
     const empty = shuffle(normal.filter(s => s.count === 0)), full = shuffle(normal.filter(s => s.count > 0));
@@ -1142,7 +1188,6 @@ export class Game {
     let best = null, bd = 1e9;
     this.spots.forEach(s => { if (s.count <= 0) return; const d = d2(s.x, s.z, b.x, b.z); if (d < bd) { bd = d; best = s; } });
     b.echo = { t: 0, spot: best }; b.echoCd = ECHO_CD; b.idleT = 0;
-    if (best && best.golden) best.revealT = Math.max(best.revealT, ECHO_DUR + 3);
     if (best) this.burst(best.x, .6, best.z, 12, [b.color, '#FFF3B0'], 2.5);
     this.sound.play('squeak'); this.rumble(b, .12, .5, 0);
   }
@@ -1203,12 +1248,15 @@ export class Game {
   clap(source) {
     this.clapFlash = .35;
     if (this.state !== 'play' || !this.started) return false;
-    if (this.clapBoost >= CLAP_MAX) { this.sound.play('tick'); return false; }
-    const push = Math.min(CLAP_PUSH, CLAP_MAX - this.clapBoost, this.elapsed);
-    if (push <= 0) return false;
-    this.elapsed -= push; this.clapBoost += push;
-    this.sound.play('clap'); this.lastClap = { t: this.time, source };
-    return true;
+    // bats in jail? Then the crowd's claps help them out sooner
+    const jailed = this.bats.filter(b => b.state === 'caged');
+    if (jailed.length) {
+      jailed.forEach(b => { b.cageT = Math.max(0, b.cageT - CLAP_CAGE); });
+      if (this.jail) { this.burst(this.jail.x, 2.2, this.jail.z, 10, ['#F5D66B', '#FFF3B0', '#9FE0C9'], 3, 1, 1, 2); this.addIcon(this.jail.x, 2.8, this.jail.z, 'clap', 40, .9); }
+      this.sound.play('clap'); this.lastClap = { t: this.time, source };
+      return true;
+    }
+    return false; // no bats in jail: clapping does nothing (it never changes the time of the night)
   }
 
   // =================================================================
@@ -1217,7 +1265,7 @@ export class Game {
   update(dt) {
     this.time += dt;
     const pads = this.readPads();
-    if (this.state === 'menu' && pads.some(p => p && p.any)) { this.start(); return; }
+    if (this.state === 'menu' && !this.padCheckOpen && pads.some(p => p && p.any)) { this.start(); return; }
     if (this.state === 'end') { this.endTimer += dt; if (this.endTimer > 1.2 && pads.some(p => p && p.any)) { this.start(); return; } }
     // the tutorial pauses the night: every step plays for a few seconds, any button skips ahead
     if (this.tutorial) {
@@ -1243,9 +1291,9 @@ export class Game {
 
     if (this.state === 'play') pads.forEach((pd, i) => {
       if (!pd) return; const b = this.bats[3 + i];
-      if (b.state === 'sleep' && pd.any) this.wake(b);
-      else if (b.state === 'active' && pd.edges.slice(0, 4).some(Boolean)) this.tryEcho(b);
-      if (b.state === 'active' && pd.edges.slice(4, 8).some(Boolean)) this.tryPass(b); // shoulder buttons (SL / SR on a Joy-Con)
+      if (b.state === 'sleep' && (pd.hid ? pd.shake : pd.any)) this.wake(b); // Joy-Con: shake it to wake the bat
+      else if (b.state === 'active' && pd.echo) this.tryEcho(b);
+      if (b.state === 'active' && pd.pass) this.tryPass(b); // shoulder buttons
     });
 
     // the night shift: a third watchman
@@ -1255,6 +1303,12 @@ export class Game {
       if (!this.shiftDone) { this.shiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A', 'lantern'); this.sound.play('alarm'); }
     }
 
+    // the late shift: in 5-minute nights a fourth watchman joins
+    const w4 = this.watchmen[3];
+    if (w4 && !w4.active && this.started && this.roundTime >= 240 && p >= FOURTH_WATCHMAN_AT) {
+      Object.assign(w4, { active: true, x: w4.path[0][0], z: w4.path[0][1], seg: 1, mode: 'patrol' });
+      if (!this.lateShiftDone) { this.lateShiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A', 'lantern'); this.sound.play('alarm'); }
+    }
     this.updateWatchmen(dt, p, !this.started);
     this.updateCat(dt, !this.started);
     this.flyers.forEach(f => {
@@ -1291,7 +1345,7 @@ export class Game {
         } else {
           const pd = pads[i - 3];
           if (!pd) { this.sleepBat(b); return; }
-          dvx = pd.ax * vmax; dvz = pd.ay * vmax; input = Math.hypot(pd.ax, pd.ay) > .2 || pd.any;
+          dvx = pd.ax * vmax; dvz = pd.ay * vmax; input = Math.hypot(pd.ax, pd.ay) > .2 || pd.any || (pd.motion || 0) > .3;
         }
       }
       if (b.napT > 0) { dvx = 0; dvz = 0; }
@@ -1477,15 +1531,15 @@ export class Game {
       const blink = L.warn && Math.floor(t * 8) % 2 === 0;
       const on = L.onNow;
       L.pool.visible = on || blink; L.ring.visible = on || L.warn;
-      L.pool.material.opacity = on ? .26 : .1; L.ring.material.opacity = on ? .25 : .14;
+      L.pool.material.opacity = on ? .16 : .05; L.ring.material.opacity = on ? .2 : .08;
       L.headMat.color.set(on ? '#FFE9A8' : blink ? '#B8A46A' : '#4A4370');
-      L.light.intensity = on ? 5 : blink ? 1.5 : 0;
+      L.light.intensity = on ? 2.5 : blink ? .8 : 0;
     });
 
     this.spots.forEach(s => {
       const vis = !s.golden || s.revealT > 0, n = Math.min(s.count, s.bulbs.length);
       s.bulbs.forEach((m, i) => { m.visible = vis && i < n; if (!s.golden) { m.rotation.z = Math.sin(t * 2.2 + s.ph + i) * .12; } });
-      if (s.halo) { s.halo.visible = n > 0; s.halo.material.opacity = .4 + Math.sin(t * 2.5 + s.ph) * .15; }
+      if (s.halo) { s.halo.visible = n > 0; s.halo.material.opacity = .3 + Math.sin(t * 2.5 + s.ph) * .08; }
       if (s.golden) { const a = Math.min(1, s.revealT / 1.2); s.glow.visible = vis && s.count > 0; s.glow.material.opacity = .9 * a; s.group.position.y = .1 + Math.sin(t * 4) * .06; }
     });
     this.flyers.forEach(f => {
@@ -1506,9 +1560,9 @@ export class Game {
       w.pool.position.set(w.x, .16, w.z); w.pool.scale.setScalar(R * 2.25 * fl2);
       w.ring.position.set(w.x, .17, w.z); w.ring.scale.setScalar(R);
       const hot = w.alertT > 0 || w.mode === 'chase';
-      w.ring.material.color.set(hot ? '#FF5A4A' : w.mode === 'investigate' ? '#F4B183' : '#FFE08A');
-      w.pool.material.color.set(hot ? '#FF9A7A' : '#FFD98A');
-      w.light.intensity = 14 * fl2;
+      w.ring.material.color.set(hot ? '#FF5A4A' : w.mode === 'investigate' ? '#F4B183' : '#FFD060');
+      w.pool.material.color.set(hot ? '#FF9A7A' : '#FFC85A');
+      w.light.intensity = 20 * fl2; // the guards' lanterns are the brightest lights in the village: that's where the danger is
     });
     const c = this.cat; c.g.position.set(c.x, c.pause > 0 ? 0 : Math.abs(Math.sin(t * 10)) * .04, c.z); c.g.rotation.y = c.angle || 0; c.tail.rotation.z = Math.sin(t * 3) * .5;
 
@@ -1651,14 +1705,13 @@ export class Game {
     ui.fill.style.transform = `scaleY(${c.level.toFixed(3)})`;
     if (ui.thr) ui.thr.style.bottom = `${(c.threshold * 100).toFixed(1)}%`;
     if (ui.root) ui.root.classList.toggle('flash', this.clapFlash > 0);
-    if (ui.boost) ui.boost.style.transform = `scaleX(${(1 - this.clapBoost / CLAP_MAX).toFixed(3)})`;
   }
   hud() {
     return {
       state: this.state, started: this.started, left: this.remaining(), burned: this.burned,
       timeLeft: Math.max(0, Math.ceil(this.roundTime - this.elapsed)), progress: this.started ? clamp(this.elapsed / this.roundTime, 0, 1) : 0,
       banner: this.banner ? { text: this.banner.text, color: this.banner.color, icon: this.banner.icon } : null,
-      tutorial: this.tutorial ? { step: this.tutorial.step, t: this.tutorial.t } : null, clapping: this.clapFlash > 0, mic: this.clapper.status, clapLeft: Math.max(0, CLAP_MAX - this.clapBoost), total: this.remaining() + this.burned,
+      tutorial: this.tutorial ? { step: this.tutorial.step, t: this.tutorial.t } : null, jailed: this.bats.filter(b => b.state === 'caged').length, clapping: this.clapFlash > 0, mic: this.clapper.status, clapLeft: Math.max(0, CLAP_MAX - this.clapBoost), total: this.remaining() + this.burned,
       count: this.state === 'countdown' ? Math.max(1, Math.ceil(this.cdT)) : 0,
       awake: this.bats.filter(b => b.state === 'active' || b.state === 'caged' || b.state === 'carried').length,
       players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active' || b.state === 'caged' || b.state === 'carried', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, napping: b.napT > 0, caged: b.state === 'caged' || b.state === 'carried', cageLeft: Math.max(0, Math.ceil(b.cageT)), echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0, echoLocked: !!b.carrying })),

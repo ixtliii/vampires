@@ -5,7 +5,7 @@ import re, pathlib
 root = pathlib.Path(__file__).parent
 css = (root / 'styles.css').read_text(encoding='utf-8')
 code = ['import * as THREE from \'three\';']
-for name in ['config.js', 'i18n.js', 'icons.js', 'clap.js', 'buildings.js', 'paint.js', 'audio.js', 'game.js', 'ui.js']:
+for name in ['config.js', 'i18n.js', 'icons.js', 'clap.js', 'joycon.js', 'buildings.js', 'paint.js', 'audio.js', 'game.js', 'ui.js']:
     src = (root / 'src' / name).read_text(encoding='utf-8')
     src = re.sub(r"^import [^;]*? from '(\./[^']+|three)';\n", '', src, flags=re.M | re.S)
     src = re.sub(r'^export ', '', src, flags=re.M)
