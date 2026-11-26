@@ -29,7 +29,8 @@ function CrowdOptions({ mic, setMic, sens, setSens, micStatus }) {
     msg ? h('p', { className: 'micmsg ' + msg[0], role: 'status' }, msg[1]) : null);
 }
 
-function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart, crowd, tut, setTut, painted, setPaintedStyle, openPads }) {
+const TiltSensSeg = ({ value, onChange }) => h(Seg, { label: t('tiltSens'), value, onChange, options: [{ v: 'low', label: t('sensLow') }, { v: 'medium', label: t('sensMed') }, { v: 'high', label: t('sensHigh') }] });
+function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart, crowd, tut, setTut, painted, setPaintedStyle, openPads, tiltSens, setTiltSens }) {
   return h('div', { className: 'overlay' }, h(MenuBats), h('div', { className: 'card' },
     h('div', { className: 'options' },
       h(Seg, { label: t('language'), value: lang, onChange: changeLang, options: LANGS.map(l => ({ v: l.id, label: l.label, lang: l.id })) })),
@@ -51,6 +52,7 @@ function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound,
       h(Seg, { label: t('roundLength'), value: roundTime, onChange: setRoundTime, options: [{ v: 300, label: t('min5') }, { v: 180, label: t('min3') }] }),
       h(Seg, { label: t('sound'), value: sound, onChange: setSound, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] }),
       h(Seg, { label: t('tutorial'), value: tut, onChange: setTut, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] }),
+      h(TiltSensSeg, { value: tiltSens, onChange: setTiltSens }),
       h(Seg, { label: t('style'), value: painted, onChange: setPaintedStyle, options: [{ v: true, label: t('stylePainted') }, { v: false, label: t('styleClean') }] })),
     h(CrowdOptions, crowd),
     error ? h('p', { className: 'note', style: { color: 'var(--coral)' } }, t('noRenderer')) : null,
@@ -102,7 +104,7 @@ function Tutorial({ tu }) {
     h('p', { className: 'tut-skip' }, t('tutSkip'))));
 }
 // controller check: shows what Chrome sees and which bat each controller drives
-function PadCheck({ game, onClose, upright, setUpright }) {
+function PadCheck({ game, onClose, upright, setUpright, tilt, setTilt, tiltSens, setTiltSens }) {
   const [, tick] = useState(0), [msg, setMsg] = useState('');
   const connect = async () => { const r = await game.joycons.request(); setMsg(r === 'unsupported' ? t('padNoHid') : ''); };
   useEffect(() => { game.padCheckOpen = true; const id = setInterval(() => tick(n => n + 1), 80); return () => { clearInterval(id); game.padCheckOpen = false; }; }, [game]);
@@ -110,7 +112,7 @@ function PadCheck({ game, onClose, upright, setUpright }) {
   let raw = []; try { raw = Array.from(navigator.getGamepads ? navigator.getGamepads() : []).filter(Boolean); } catch (e) {}
   return h('div', { className: 'overlay padcheck-wrap' }, h('div', { className: 'card padcheck', role: 'dialog', 'aria-label': t('padCheck') },
     h('h2', null, t('padCheck')),
-    h('p', { className: 'note' }, t('padHint')),
+    h('p', { className: 'note' }, tilt ? (upright ? t('padTiltHint') : t('padTiltHintSide')) : t('padHint')),
     h('div', { className: 'actions' }, h('button', { type: 'button', className: 'ghost', onClick: connect }, t('padConnect')), h('span', { className: 'small' }, game.joycons.supported ? t('padConnectHint') : t('padNoHid'))),
     msg ? h('p', { className: 'micmsg bad' }, msg) : null,
     h('div', { className: 'pc-list' }, [0, 1, 2, 3].map(i => {
@@ -121,12 +123,19 @@ function PadCheck({ game, onClose, upright, setUpright }) {
         h('div', { className: 'pc-stick' }, h('i', { style: st ? { left: `${50 + st.ax * 40}%`, top: `${50 + st.ay * 40}%` } : null })),
         p && p.hid ? h('span', { className: 'pc-id' }, `${t(p.hid.side === 'L' ? 'padLeftHalf' : p.hid.side === 'R' ? 'padRightHalf' : 'padPro')} · ${t('padLight', { n: p.hid.light })}`,
           h('span', { className: 'pc-shake' + (performance.now() - p.hid.shakeAt < 700 ? ' hit' : '') }, h('i', { style: { transform: `scaleX(${(st && st.motion || 0).toFixed(2)})` } })),
-          performance.now() - p.hid.shakeAt < 700 ? h('b', { className: 'pc-shook' }, t('padShaken')) : null) :
+          performance.now() - p.hid.shakeAt < 700 ? h('b', { className: 'pc-shook' }, t('padShaken')) : null,
+          tilt && p.hid.side !== 'P' ? h('span', { className: 'pc-flip' },
+            h('button', { type: 'button', className: 'ghost small' + ((game.joycons.flips[p.hid.flipKey] || {}).x ? ' on' : ''), onClick: () => game.joycons.flip(p.hid.flipKey, 'x') }, t('padFlipX')),
+            h('button', { type: 'button', className: 'ghost small' + ((game.joycons.flips[p.hid.flipKey] || {}).y ? ' on' : ''), onClick: () => game.joycons.flip(p.hid.flipKey, 'y') }, t('padFlipY')),
+            h('button', { type: 'button', className: 'ghost small', onClick: () => game.joycons.recenter(i) }, t('padRecenter'))) : null) :
         h('span', { className: 'pc-id' }, p ? `${p.half ? (p.half === 'L' ? t('padLeftHalf') : t('padRightHalf')) + ' · ' : ''}${p.gp.id.replace(/\s*\(.*?Vendor.*\)/i, '')}` : t('padNone')),
         h('span', { className: 'pc-btns' }, st && st.pressed.length ? st.pressed.join(' ') : ''));
     })),
     h('p', { className: 'small' }, t('padRaw', { n: raw.length }), ' ', raw.map(g => `#${g.index}: ${g.id.slice(0, 40)}`).join(' | ')),
-    h('div', { className: 'options' }, h(Seg, { label: t('padHeld'), value: upright, onChange: setUpright, options: [{ v: false, label: t('padSideways') }, { v: true, label: t('padUpright') }] })),
+    h('div', { className: 'options' },
+      h(Seg, { label: t('padSteer'), value: tilt, onChange: setTilt, options: [{ v: true, label: t('padTilt') }, { v: false, label: t('padStick') }] }),
+      h(Seg, { label: t('padHeld'), value: upright, onChange: setUpright, options: [{ v: false, label: t('padSideways') }, { v: true, label: t('padUpright') }] }),
+      tilt ? h(TiltSensSeg, { value: tiltSens, onChange: setTiltSens }) : null),
     h('div', { className: 'actions' }, h('button', { type: 'button', className: 'big', onClick: onClose, autoFocus: true }, t('padDone')))));
 }
 // a few bats flapping across the menu
@@ -214,8 +223,13 @@ function Hud({ hud, game }) {
     h('div', { className: 'players' }, hud.players.map(p => h('div', { key: p.slot, className: 'chip' + (p.out ? ' out' : p.awake ? '' : ' sleep') },
       h('span', { className: 'chip-bat', style: { color: p.color }, 'aria-hidden': 'true', dangerouslySetInnerHTML: { __html: ICONS.bat } }), p.name,
       h('span', { className: 'hp', 'aria-label': t('livesLabel', { n: p.lives }) }, [0, 1, 2].map(i => i < p.lives ? h('span', { key: i }, '♥') : h('s', { key: i }, '♥'))),
-      p.caged ? h('span', { className: 'ec caged' }, t('chipCaged', { n: p.cageLeft })) : p.out ? ` ${t('chipOut')}` : p.napping ? h('span', { className: 'ec' }, 'zzz') : p.awake ? h('span', { className: 'ec' + (p.echoLocked ? ' locked' : p.echo ? '' : ' ready') }, p.echo ? t('chipEcho', { n: p.echo }) : t('chipEchoReady')) : ` ${t('chipAsleep')}`,
-      p.carrying ? ` · ${t('chipGarlic')}` : null))),
+      p.lost ? h('span', { className: 'ec lost' }, t('chipLost'))
+        : p.caged ? h('span', { className: 'st' }, h(Icon, { name: 'cage', className: 'ic' }), p.cageLeft)
+        : p.out ? ` ${t('chipOut')}`
+        : p.napping ? h('span', { className: 'st' }, h(Icon, { name: 'zzz', className: 'ic' }))
+        : !p.awake ? h('span', { className: 'st' }, h(Icon, { name: 'zzz', className: 'ic' }))
+        : p.carrying ? h('span', { className: 'st garlic', title: t('chipGarlic') }, h(Icon, { name: 'garlic', className: 'ic' }))
+        : h('span', { className: 'st ' + (p.echo ? 'cool' : 'ready'), title: p.echo ? t('chipEcho', { n: p.echo }) : t('chipEchoReady') }, h(Icon, { name: 'echo', className: 'ic' }), p.echo ? p.echo : null)))),
     hud.jailed > 0 && hud.state === 'play' ? h('div', { className: 'clap-jail', role: 'status' }, h(Icon, { name: 'clap' }), t('clapJail', { n: hud.jailed })) : null,
     h(ClapMeter, { game, hud }),
     h('div', { className: 'badge' }, hud.backend));
@@ -235,8 +249,11 @@ function App() {
     setMicStatus('starting'); setMicStatus(await g.clapper.enable());
   };
   const [tut, setTutState] = useState(true);
-  const [padCheck, setPadCheck] = useState(false), [upright, setUprightState] = useState(false);
+  const [padCheck, setPadCheck] = useState(false), [upright, setUprightState] = useState(false), [tilt, setTiltState] = useState(true);
   const setUpright = v => { setUprightState(v); if (gameRef.current) gameRef.current.padUpright = v; };
+  const setTilt = v => { setTiltState(v); if (gameRef.current) gameRef.current.padTilt = v; };
+  const [tiltSens, setTiltSensState] = useState(() => { try { return localStorage.getItem('vgh-tilt-sens') || 'medium'; } catch (e) { return 'medium'; } });
+  const setTiltSens = v => { setTiltSensState(v); try { localStorage.setItem('vgh-tilt-sens', v); } catch (e) {} if (gameRef.current && gameRef.current.joycons) gameRef.current.joycons.sens = v; };
   const [painted, setPaintedState] = useState(!new URLSearchParams(location.search).has('clean'));
   const setPaintedStyle = v => { setPaintedState(v); if (gameRef.current) gameRef.current.setStyle(v); };
   const setTut = v => { setTutState(v); if (gameRef.current) gameRef.current.tutorialOn = v; };
@@ -258,8 +275,8 @@ function App() {
     painted ? h('div', { className: 'grain', 'aria-hidden': 'true' }) : null,
     h('div', { ref: layerRef, className: 'layer', 'aria-hidden': 'true' }),
     screen !== 'menu' && screen !== 'end' ? h(Hud, { hud, game: gameRef.current }) : null,
-    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start, crowd: { mic, setMic, sens, setSens, micStatus }, tut, setTut, painted, setPaintedStyle, openPads: () => setPadCheck(true) }) : null,
-    screen === 'menu' && padCheck && gameRef.current ? h(PadCheck, { game: gameRef.current, onClose: () => setPadCheck(false), upright, setUpright }) : null,
+    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start, crowd: { mic, setMic, sens, setSens, micStatus }, tut, setTut, painted, setPaintedStyle, openPads: () => setPadCheck(true), tiltSens, setTiltSens }) : null,
+    screen === 'menu' && padCheck && gameRef.current ? h(PadCheck, { game: gameRef.current, onClose: () => setPadCheck(false), upright, setUpright, tilt, setTilt, tiltSens, setTiltSens }) : null,
     screen === 'end' && result ? h(End, { r: result, onAgain: start, onMenu: () => gameRef.current.toMenu() }) : null);
 }
 

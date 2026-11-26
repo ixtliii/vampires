@@ -413,6 +413,65 @@ kbd{background:linear-gradient(180deg,#5B4A92,#3A2D66);border:0;border-radius:7p
 .clap-jail .ic svg{width:100%;height:100%}
 @keyframes clapJail{50%{box-shadow:inset 0 0 0 3px #F5D66B,inset 0 0 0 6px var(--st-deep),0 4px 0 var(--st-deep),0 0 30px rgba(245,214,107,.6)}}
 @media (prefers-reduced-motion: reduce){.clap-jail{animation:none}}
+.pc-id:has(.pc-flip){white-space:normal;overflow:visible}
+.pc-flip{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pc-flip button{padding:4px 10px;font-size:13px;min-height:0}
+.pc-flip button.on{background:#F5D66B;color:#2A1E4A;border-color:#F5D66B}
+.chip .ec.lost{background:linear-gradient(180deg,#F07A6A,#C24E4E);color:#fff;animation:lostPulse 1s ease-in-out infinite}
+@keyframes lostPulse{50%{opacity:.55}}
+
+/* ---- bat tag: name + hearts on one line, then one icon bubble = "what your button does now" ---- */
+.tag{gap:4px}
+.tag .row{display:flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:rgba(14,11,32,.55)}
+.tag .row .nm{font:700 14px/1 var(--display)}
+.tag .hearts{font-size:12px}
+.tag .echo{gap:4px;padding:3px;border-radius:999px;background:rgba(14,11,32,.8);box-shadow:0 0 0 2px #1B1438;animation:none}
+.tag .echo .aic{display:block;width:26px;height:26px}
+.tag .echo .aic svg{width:100%;height:100%;display:block}
+.tag .echo i{display:none}
+.tag .echo em{display:none;font:700 14px/1 var(--display);padding-right:6px;color:#fff}
+/* the little "press a button" dot */
+.tag .echo .btn{display:none;width:18px;height:18px;border-radius:50%;margin-left:2px;background:radial-gradient(circle at 45% 40%,#fff 0 3px,#3A2D66 4px);box-shadow:0 0 0 2px #fff}
+.tag .echo.m-echo .btn,.tag .echo.m-pass .btn{display:block}
+.tag .echo.m-echo{background:linear-gradient(180deg,#9EF0FF,#2FB8D6);animation:readyGlow 1.4s ease-in-out infinite}
+.tag .echo.m-pass{background:linear-gradient(180deg,#C9FFE9,#5FD3A8);animation:passGlow .9s ease-in-out infinite}
+.tag .echo.m-fire{background:linear-gradient(180deg,#FFD08A,#F08A3A);box-shadow:0 0 0 2px #1B1438,0 0 14px rgba(255,170,80,.7)}
+.tag .echo.m-cool{background:conic-gradient(rgba(127,214,224,.85) calc(var(--p,0)*1turn), rgba(14,11,32,.8) 0);opacity:.75}
+.tag .echo.m-cool .aic{opacity:.45;filter:grayscale(1)}
+.tag .echo.m-nap{opacity:.85}
+.tag .echo.m-cage{background:linear-gradient(180deg,#8A7AB8,#5D4A9E)}
+.tag .echo.m-cage em{display:block}
+@keyframes readyGlow{50%{box-shadow:0 0 0 2px #1B1438,0 0 16px #7FE3F5}}
+@keyframes passGlow{50%{box-shadow:0 0 0 2px #1B1438,0 0 18px #9FE0C9}}
+@media (prefers-reduced-motion: reduce){.tag .echo.m-echo,.tag .echo.m-pass{animation:none}}
+.tag .passhint{display:none!important}
+/* shaken: "that's me!" */
+.tag.ident .row{background:rgba(14,11,32,.85);box-shadow:0 0 0 3px currentColor,0 0 20px rgba(255,255,255,.55)}
+.tag.ident .row .nm{font-size:20px}
+
+/* ---- bottom chips: icons instead of words ---- */
+.chip .st{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;background:linear-gradient(180deg,#5B4A92,#3A2D66);font:700 13px/1 var(--display);color:#fff}
+.chip .st .ic{width:20px;height:20px;display:block}
+.chip .st .ic svg{width:100%;height:100%;display:block}
+.chip .st.ready{background:linear-gradient(180deg,#9EF0FF,#2FB8D6)}
+.chip .st.garlic{background:linear-gradient(180deg,#FFF6DC,#E6D6B0)}
+.chip .st.cool .ic{opacity:.5;filter:grayscale(1)}
+
+/* the clap notice sits under the timer, out of the way of the village */
+.clap-jail{right:auto;left:50%;bottom:auto;top:78px;transform:translateX(-50%);font-size:15px;padding:6px 12px 6px 6px;max-width:none;white-space:nowrap}
+.clap-jail .ic{width:26px;height:26px}
+/* round icon badges (no "button dot"): dark inside so the coloured icon reads, coloured ring = state */
+.tag .echo .btn{display:none!important}
+.tag .echo{width:38px;height:38px;padding:5px;box-sizing:border-box;justify-content:center;border-radius:50%}
+.tag .echo .aic{width:28px;height:28px}
+.tag .echo.m-echo{background:#1B1438;box-shadow:0 0 0 3px #7FE3F5,0 0 12px rgba(127,227,245,.6)}
+.tag .echo.m-pass{background:#1B1438;box-shadow:0 0 0 3px #9FE0C9,0 0 12px rgba(159,224,201,.6)}
+.tag .echo.m-fire{background:#1B1438;box-shadow:0 0 0 3px #FFB347,0 0 12px rgba(255,170,80,.6)}
+.tag .echo.m-cool{background:conic-gradient(rgba(127,214,224,.8) calc(var(--p,0)*1turn), rgba(14,11,32,.85) 0);box-shadow:0 0 0 2px #1B1438}
+.tag .echo.m-cage{width:auto;border-radius:999px;padding:4px 8px 4px 5px;gap:3px}
+@keyframes readyGlow{50%{box-shadow:0 0 0 3px #7FE3F5,0 0 22px rgba(127,227,245,.9)}}
+@keyframes passGlow{50%{box-shadow:0 0 0 3px #9FE0C9,0 0 22px rgba(159,224,201,.9)}}
+.chip .st.ready{background:#1B1438;box-shadow:0 0 0 2px #7FE3F5}
 </style>
 <div id="root"></div>
 <script src="models/models.js"></script>
@@ -540,6 +599,8 @@ const GRAVEYARD = { x: 1.6, z: -7.0, w: 3.2, d: 2.2 };
 const FIELDS = [{ x: -9, z: -10.2, w: 4, d: 1.0 }, { x: -14.5, z: 10.25, w: 3.4, d: .9 }, { x: 0.8, z: 10.25, w: 3.2, d: .9 }]; // little garlic-free vegetable patches at the edge
 const STALLS = [{ x: -0.9, z: -1.95, color: '#F07A6A' }, { x: -3.1, z: 1.95, color: '#7FD6E0' }];
 
+const IDENT_T = 2.4; // seconds a bat lights up after its Joy-Con is shaken
+
 // ----- src/i18n.js -----
 // =====================================================================
 // Vampire Garlic Heist: translations (English, Dutch, Russian, Ukrainian).
@@ -563,7 +624,7 @@ const S = {
     lampsT: 'Lamps & the cat', lampsD: 'Street lamps switch on and off; their light slows your bat down. The cat meows if you fly too close, calling a watchman over.',
     thPlayer: 'Player', thWake: 'Wake up', thFly: 'Fly', thEcho: 'Echolocate',
     click: 'Click', moveMouse: 'Move the mouse', rightClickOr: 'Right-click or', keySpace: 'Space', arrowKeys: 'Arrow keys',
-    pad: 'Joy-Con / gamepad', anyButton: 'Shake it!', stick: 'Stick', faceButton: 'Any face button',
+    pad: 'Joy-Con / gamepad', anyButton: 'Shake it!', stick: 'Tilt the Joy-Con', faceButton: 'Any button',
     note: 'Echolocation sends sound waves to the garlic closest to your bat and marks it. The echo meter above your bat glows when it is ready again. Fly next to a teammate and press Pass to hand them your garlic. When a bat is in jail, the crowd can clap (or press C) to free it sooner. Lose all 3 lives and a watchman carries your bat off to the jail (bottom right) for 20 seconds; teammates who hover at the jail door break everyone out sooner. Bats still outside the castle at sunrise turn to dust. A bat that sits still for 25 seconds goes back to sleep.',
     escBack: 'returns here.',
     roundLength: 'Round length', min3: '3 min', sec90: '90 sec', sound: 'Sound', on: 'On', off: 'Off', language: 'Language',
@@ -589,11 +650,11 @@ const S = {
     yuck: 'yuck!', golden: '+3 golden!', whoosh: 'whoosh! +1', nightShift: 'The night shift starts: another watchman!',
     rooster: 'Cock-a-doodle-doo! Back to the castle!', allGone: 'All the garlic is gone! Hold on…', mwahaha: 'MWAHAHA!',
     allCaught: 'Every bat got caught!', meow: 'Meow!', sunPoof: 'The sun is up! Poof…', sunSafe: 'The sun is up! Everyone made it to the castle.',
-    thPass: 'Pass garlic', passMouse: 'F or middle-click', passKeys2: 'Right Shift or /', shoulder: 'SL / SR shoulder button', crowd: 'Crowd clapping', micOpt: 'Microphone', sensitivity: 'Sensitivity', sensLow: 'Low', sensMed: 'Medium', sensHigh: 'High', micStarting: 'Asking for the microphone…', micOn: 'Listening. Clap loudly to free bats from jail!', micDenied: 'Microphone blocked. Allow it in the browser’s address bar, or use the C key or the clap button.', micUnavailable: 'No microphone found. Use the C key or the clap button instead.', clapBtn: 'Clap!', clapLabel: 'Crowd clap meter', clapLeft: '+{n}s left', jarLabel: '{n} of {total} garlic bulbs burned', sunLabel: 'Sunrise in {t}',
+    thPass: 'Pass garlic', passMouse: 'F or middle-click', passKeys2: 'Right Shift or /', shoulder: 'Any button (with garlic)', crowd: 'Crowd clapping', micOpt: 'Microphone', sensitivity: 'Sensitivity', sensLow: 'Low', sensMed: 'Medium', sensHigh: 'High', micStarting: 'Asking for the microphone…', micOn: 'Listening. Clap loudly to free bats from jail!', micDenied: 'Microphone blocked. Allow it in the browser’s address bar, or use the C key or the clap button.', micUnavailable: 'No microphone found. Use the C key or the clap button instead.', clapBtn: 'Clap!', clapLabel: 'Crowd clap meter', clapLeft: '+{n}s left', jarLabel: '{n} of {total} garlic bulbs burned', sunLabel: 'Sunrise in {t}',
     tutTitle: 'How to play', tut0: 'Fly to the garlic!', tut1: 'Hover over it to grab it', tut2: 'Burn it in the castle fire!', tut3: 'Stay out of the lantern light!', tutSkip: 'Press any button to skip', tutorial: 'Tutorial', tutGo: 'Go, go, go!', starsLabel: '{n} of 3 stars',
     style: 'Style', stylePainted: 'Painted', styleClean: 'Clean',
     chipCaged: 'caged {n}s', tagCaged: 'Cage {n}s', freeFriend: '{name} is in jail! Fly to the jail door to break them out', jailbreak: 'Jailbreak!', freed: '{name} is free!',
-    padCheck: 'Controller check', padHint: 'Move each stick and press buttons: the dot and numbers show which bat that controller drives. Two Joy-Cons that Chrome merged into one show up as a left half and a right half.', padNone: 'not connected: press a button on the controller', padLeftHalf: 'left Joy-Con', padRightHalf: 'right Joy-Con', padRaw: 'Chrome sees {n} gamepad(s):', padHeld: 'Joy-Cons are held', padSideways: 'Sideways', padUpright: 'Upright', padDone: 'Done',
+    padCheck: 'Controller check', padHint: 'Move each stick and press buttons: the dot and numbers show which bat that controller drives. Two Joy-Cons that Chrome merged into one show up as a left half and a right half.', padNone: 'not connected: press a button on the controller', padLeftHalf: 'left Joy-Con', padRightHalf: 'right Joy-Con', padRaw: 'Chrome sees {n} gamepad(s):', padHeld: 'Joy-Cons are held', padSideways: 'Sideways', padUpright: 'Pointing', padDone: 'Done', chipLost: 'controller lost', tiltSens: 'Tilt sensitivity', padSteer: 'Fly by', padTilt: 'Tilting', padStick: 'Stick', padFlipX: 'Flip ↔', padFlipY: 'Flip ↕', padRecenter: 'Set straight', padTiltHintSide: 'Hold each Joy-Con sideways in both hands, stick on the left. Tip the top edge away from you to fly up, towards you to fly down; lower the right end to go right, the left end to go left. If a direction is the wrong way round, press Flip. Clicking the stick in makes the current angle “straight”.', padTiltHint: 'Hold each Joy-Con like a remote pointed at the screen: almost flat, buttons up. Dip the nose to fly up, lift it to fly down, roll it left or right to steer. If a direction is the wrong way round, press Flip (it counts for every left or every right Joy-Con). Clicking the stick in makes the current angle “straight”.',
     padConnect: 'Connect Joy-Cons', padConnectHint: 'Chrome asks for each Joy-Con: pick one, click Connect, repeat. Once allowed, they reconnect by themselves.', padNoHid: 'This browser can\'t connect Joy-Cons directly: use Chrome and the start script (not the hosted link).', padPro: 'Pro Controller', padLight: 'light {n}', padShaken: 'shaken!',
     min5: '5 min', clapJail: 'Clap to free the bats in jail faster!',
     bulbs: ['garlic bulb', 'garlic bulbs']
@@ -607,7 +668,7 @@ const S = {
     lampsT: 'Lantaarns & de kat', lampsD: 'Straatlantaarns gaan aan en uit; in hun licht vliegt je vleermuis trager. De kat miauwt als je te dichtbij vliegt en roept zo een nachtwaker.',
     thPlayer: 'Speler', thWake: 'Wakker maken', thFly: 'Vliegen', thEcho: 'Echolocatie',
     click: 'Klikken', moveMouse: 'Beweeg de muis', rightClickOr: 'Rechtsklik of', keySpace: 'Spatie', arrowKeys: 'Pijltjestoetsen',
-    pad: 'Joy-Con / gamepad', anyButton: 'Schudden!', stick: 'Stick', faceButton: 'Een van de vier knoppen',
+    pad: 'Joy-Con / gamepad', anyButton: 'Schudden!', stick: 'Kantel de Joy-Con', faceButton: 'Elke knop',
     note: 'Echolocatie stuurt geluidsgolven naar de knoflook die het dichtst bij je vleermuis is en markeert die. De echometer boven je vleermuis gloeit als je hem weer kunt gebruiken. Vlieg naast een teamgenoot en druk op Doorgeven om je knoflook af te geven. Zit er een vleermuis in de gevangenis, dan kan het publiek klappen (of op C drukken) om hem sneller te bevrijden. Ben je alle 3 levens kwijt, dan brengt een nachtwaker je vleermuis 20 seconden naar de gevangenis (rechtsonder); teamgenoten die bij de deur zweven, bevrijden iedereen eerder. Vleermuizen die bij zonsopgang nog buiten het kasteel zijn, vergaan tot stof. Een vleermuis die 25 seconden stilzit, gaat weer slapen.',
     escBack: 'brengt je hier terug.',
     roundLength: 'Duur van een ronde', min3: '3 min', sec90: '90 sec', sound: 'Geluid', on: 'Aan', off: 'Uit', language: 'Taal',
@@ -633,11 +694,11 @@ const S = {
     yuck: 'bah!', golden: '+3 goud!', whoosh: 'woesj! +1', nightShift: 'De nachtploeg begint: nog een nachtwaker!',
     rooster: 'Kukeleku! Terug naar het kasteel!', allGone: 'Alle knoflook is weg! Even volhouden…', mwahaha: 'MWAHAHA!',
     allCaught: 'Alle vleermuizen zijn betrapt!', meow: 'Miauw!', sunPoof: 'De zon is op! Poef…', sunSafe: 'De zon is op! Iedereen is veilig in het kasteel.',
-    thPass: 'Knoflook doorgeven', passMouse: 'F of middelklik', passKeys2: 'Rechter Shift of /', shoulder: 'SL / SR-schouderknop', crowd: 'Publiek klapt', micOpt: 'Microfoon', sensitivity: 'Gevoeligheid', sensLow: 'Laag', sensMed: 'Midden', sensHigh: 'Hoog', micStarting: 'Microfoon aanvragen…', micOn: 'Luistert. Klap hard om vleermuizen uit de gevangenis te bevrijden!', micDenied: 'Microfoon geblokkeerd. Sta hem toe in de adresbalk van de browser, of gebruik de C-toets of de klapknop.', micUnavailable: 'Geen microfoon gevonden. Gebruik de C-toets of de klapknop.', clapBtn: 'Klap!', clapLabel: 'Klapmeter van het publiek', clapLeft: 'nog +{n}s', jarLabel: '{n} van {total} knoflookbollen verbrand', sunLabel: 'Zonsopgang over {t}',
+    thPass: 'Knoflook doorgeven', passMouse: 'F of middelklik', passKeys2: 'Rechter Shift of /', shoulder: 'Elke knop (met knoflook)', crowd: 'Publiek klapt', micOpt: 'Microfoon', sensitivity: 'Gevoeligheid', sensLow: 'Laag', sensMed: 'Midden', sensHigh: 'Hoog', micStarting: 'Microfoon aanvragen…', micOn: 'Luistert. Klap hard om vleermuizen uit de gevangenis te bevrijden!', micDenied: 'Microfoon geblokkeerd. Sta hem toe in de adresbalk van de browser, of gebruik de C-toets of de klapknop.', micUnavailable: 'Geen microfoon gevonden. Gebruik de C-toets of de klapknop.', clapBtn: 'Klap!', clapLabel: 'Klapmeter van het publiek', clapLeft: 'nog +{n}s', jarLabel: '{n} van {total} knoflookbollen verbrand', sunLabel: 'Zonsopgang over {t}',
     tutTitle: 'Zo speel je', tut0: 'Vlieg naar de knoflook!', tut1: 'Blijf erboven zweven om hem te pakken', tut2: 'Verbrand hem in het kasteelvuur!', tut3: 'Blijf uit het licht van de lantaarn!', tutSkip: 'Druk op een knop om door te gaan', tutorial: 'Uitleg', tutGo: 'Vliegen maar!', starsLabel: '{n} van 3 sterren',
     style: 'Stijl', stylePainted: 'Geschilderd', styleClean: 'Strak',
     chipCaged: 'in de kooi {n}s', tagCaged: 'Kooi {n}s', freeFriend: '{name} zit in de gevangenis! Vlieg naar de deur om te bevrijden', jailbreak: 'Ontsnapt!', freed: '{name} is vrij!',
-    padCheck: 'Controllers testen', padHint: 'Beweeg elke stick en druk op knoppen: de stip en de cijfers tonen welke vleermuis die controller bestuurt. Twee Joy-Cons die Chrome samenvoegt, verschijnen als linker- en rechterhelft.', padNone: 'niet verbonden: druk op een knop van de controller', padLeftHalf: 'linker Joy-Con', padRightHalf: 'rechter Joy-Con', padRaw: 'Chrome ziet {n} gamepad(s):', padHeld: 'Joy-Cons worden vastgehouden', padSideways: 'Zijwaarts', padUpright: 'Rechtop', padDone: 'Klaar',
+    padCheck: 'Controllers testen', padHint: 'Beweeg elke stick en druk op knoppen: de stip en de cijfers tonen welke vleermuis die controller bestuurt. Twee Joy-Cons die Chrome samenvoegt, verschijnen als linker- en rechterhelft.', padNone: 'niet verbonden: druk op een knop van de controller', padLeftHalf: 'linker Joy-Con', padRightHalf: 'rechter Joy-Con', padRaw: 'Chrome ziet {n} gamepad(s):', padHeld: 'Joy-Cons worden vastgehouden', padSideways: 'Zijwaarts', padUpright: 'Wijzend', padDone: 'Klaar', chipLost: 'controller kwijt', tiltSens: 'Kantelgevoeligheid', padSteer: 'Vliegen met', padTilt: 'Kantelen', padStick: 'Stick', padFlipX: 'Omdraaien ↔', padFlipY: 'Omdraaien ↕', padRecenter: 'Recht zetten', padTiltHintSide: 'Houd elke Joy-Con dwars in twee handen, stick links. Kantel de bovenrand van je af om omhoog te vliegen, naar je toe om omlaag te vliegen; laat het rechteruiteinde zakken om naar rechts te gaan, het linker om naar links te gaan. Gaat een richting verkeerd om? Druk op Omdraaien. De stick indrukken maakt de huidige stand “recht”.', padTiltHint: 'Houd elke Joy-Con als een afstandsbediening naar het scherm: bijna plat, knoppen boven. Neus omlaag om omhoog te vliegen, neus omhoog om omlaag te vliegen, kantel naar links of rechts om te sturen. Gaat een richting verkeerd om? Druk op Omdraaien (geldt voor alle linker- of alle rechter-Joy-Cons). De stick indrukken maakt de huidige stand “recht”.',
     padConnect: 'Joy-Cons verbinden', padConnectHint: 'Chrome vraagt naar elke Joy-Con: kies er een, klik op Verbinden, herhaal. Daarna verbinden ze vanzelf opnieuw.', padNoHid: 'Deze browser kan Joy-Cons niet rechtstreeks verbinden: gebruik Chrome en het startscript (niet de online link).', padPro: 'Pro Controller', padLight: 'lampje {n}', padShaken: 'geschud!',
     min5: '5 min', clapJail: 'Klap om de vleermuizen sneller uit de gevangenis te halen!',
     bulbs: ['knoflookbol', 'knoflookbollen']
@@ -651,7 +712,7 @@ const S = {
     lampsT: 'Фонари и кошка', lampsD: 'Уличные фонари то включаются, то гаснут, и в их свете летучая мышь летит медленнее. Если подлететь к кошке слишком близко, она мяукнет и позовёт сторожа.',
     thPlayer: 'Игрок', thWake: 'Разбудить', thFly: 'Лететь', thEcho: 'Эхолокация',
     click: 'Щелчок', moveMouse: 'Двигать мышью', rightClickOr: 'Правый щелчок или', keySpace: 'Пробел', arrowKeys: 'Стрелки',
-    pad: 'Joy-Con / геймпад', anyButton: 'Потряси!', stick: 'Стик', faceButton: 'Любая из четырёх кнопок',
+    pad: 'Joy-Con / геймпад', anyButton: 'Потряси!', stick: 'Наклоняй Joy-Con', faceButton: 'Любая кнопка',
     note: 'Эхолокация посылает звуковые волны к ближайшему к твоей мыши чесноку и отмечает его. Шкала эха над мышью светится, когда эхо снова готово. Подлети к товарищу и нажми «Передать», чтобы отдать ему чеснок. Когда мышь в тюрьме, зрители могут хлопать (или нажимать C), чтобы освободить её быстрее. Потеряешь все 3 жизни — сторож отнесёт мышь в тюрьму (справа внизу) на 20 секунд; товарищи у двери тюрьмы освободят всех быстрее. Мыши, оставшиеся вне замка на рассвете, рассыпаются в прах. Мышь, которая 25 секунд не двигается, снова засыпает.',
     escBack: '— вернуться сюда.',
     roundLength: 'Длина раунда', min3: '3 мин', sec90: '90 сек', sound: 'Звук', on: 'Вкл', off: 'Выкл', language: 'Язык',
@@ -677,11 +738,11 @@ const S = {
     yuck: 'фу!', golden: '+3 золотой!', whoosh: 'вжух! +1', nightShift: 'Ночная смена: ещё один сторож!',
     rooster: 'Кукареку! Назад в замок!', allGone: 'Весь чеснок украден! Держитесь…', mwahaha: 'МУА-ХА-ХА!',
     allCaught: 'Все летучие мыши пойманы!', meow: 'Мяу!', sunPoof: 'Солнце взошло! Пуф…', sunSafe: 'Солнце взошло! Все успели в замок.',
-    thPass: 'Передать чеснок', passMouse: 'F или средняя кнопка мыши', passKeys2: 'Правый Shift или /', shoulder: 'Боковая кнопка SL / SR', crowd: 'Хлопки зрителей', micOpt: 'Микрофон', sensitivity: 'Чувствительность', sensLow: 'Низкая', sensMed: 'Средняя', sensHigh: 'Высокая', micStarting: 'Запрашиваем микрофон…', micOn: 'Слушаем. Хлопайте громко, чтобы освободить мышей из тюрьмы!', micDenied: 'Микрофон заблокирован. Разрешите его в адресной строке браузера или используйте клавишу C или кнопку хлопка.', micUnavailable: 'Микрофон не найден. Используйте клавишу C или кнопку хлопка.', clapBtn: 'Хлоп!', clapLabel: 'Шкала хлопков зрителей', clapLeft: 'ещё +{n} с', jarLabel: 'Сожжено {n} из {total} головок чеснока', sunLabel: 'Рассвет через {t}',
+    thPass: 'Передать чеснок', passMouse: 'F или средняя кнопка мыши', passKeys2: 'Правый Shift или /', shoulder: 'Любая кнопка (с чесноком)', crowd: 'Хлопки зрителей', micOpt: 'Микрофон', sensitivity: 'Чувствительность', sensLow: 'Низкая', sensMed: 'Средняя', sensHigh: 'Высокая', micStarting: 'Запрашиваем микрофон…', micOn: 'Слушаем. Хлопайте громко, чтобы освободить мышей из тюрьмы!', micDenied: 'Микрофон заблокирован. Разрешите его в адресной строке браузера или используйте клавишу C или кнопку хлопка.', micUnavailable: 'Микрофон не найден. Используйте клавишу C или кнопку хлопка.', clapBtn: 'Хлоп!', clapLabel: 'Шкала хлопков зрителей', clapLeft: 'ещё +{n} с', jarLabel: 'Сожжено {n} из {total} головок чеснока', sunLabel: 'Рассвет через {t}',
     tutTitle: 'Как играть', tut0: 'Лети к чесноку!', tut1: 'Зависни над ним, чтобы схватить', tut2: 'Сожги его в огне замка!', tut3: 'Не попадай в свет фонаря!', tutSkip: 'Нажми любую кнопку, чтобы пропустить', tutorial: 'Обучение', tutGo: 'Вперёд!', starsLabel: '{n} из 3 звёзд',
     style: 'Стиль', stylePainted: 'Рисованный', styleClean: 'Чистый',
     chipCaged: 'в клетке {n} с', tagCaged: 'Клетка {n} с', freeFriend: '{name} в тюрьме! Лети к двери тюрьмы и освободи', jailbreak: 'Побег из тюрьмы!', freed: '{name} на свободе!',
-    padCheck: 'Проверка контроллеров', padHint: 'Двигайте каждый стик и нажимайте кнопки: точка и цифры показывают, какой мышью управляет контроллер. Два Joy-Con, объединённые Chrome, видны как левая и правая половины.', padNone: 'не подключён: нажмите кнопку на контроллере', padLeftHalf: 'левый Joy-Con', padRightHalf: 'правый Joy-Con', padRaw: 'Chrome видит геймпадов: {n}:', padHeld: 'Joy-Con держат', padSideways: 'Боком', padUpright: 'Вертикально', padDone: 'Готово',
+    padCheck: 'Проверка контроллеров', padHint: 'Двигайте каждый стик и нажимайте кнопки: точка и цифры показывают, какой мышью управляет контроллер. Два Joy-Con, объединённые Chrome, видны как левая и правая половины.', padNone: 'не подключён: нажмите кнопку на контроллере', padLeftHalf: 'левый Joy-Con', padRightHalf: 'правый Joy-Con', padRaw: 'Chrome видит геймпадов: {n}:', padHeld: 'Joy-Con держат', padSideways: 'Боком', padUpright: 'Как пульт', chipLost: 'нет связи', padDone: 'Готово', tiltSens: 'Чувствительность наклона', padSteer: 'Полёт', padTilt: 'Наклоном', padStick: 'Стиком', padFlipX: 'Развернуть ↔', padFlipY: 'Развернуть ↕', padRecenter: 'Выровнять', padTiltHintSide: 'Держите каждый Joy-Con горизонтально двумя руками, стик слева. Наклон верхнего края от себя — лететь вверх, к себе — вниз; опустите правый конец — вправо, левый — влево. Если направление перепутано, нажмите «Развернуть». Нажатие на стик делает текущий наклон «прямым».', padTiltHint: 'Держите каждый Joy-Con как пульт, направленный на экран: почти горизонтально, кнопками вверх. Опустите нос — лететь вверх, поднимите — вниз, наклоняйте влево и вправо, чтобы рулить. Если направление перепутано, нажмите «Развернуть» (для всех левых или всех правых Joy-Con). Нажатие на стик делает текущий наклон «прямым».',
     padConnect: 'Подключить Joy-Con', padConnectHint: 'Chrome спросит про каждый Joy-Con: выбери один, нажми «Подключить», повтори. Потом они подключаются сами.', padNoHid: 'Этот браузер не может подключить Joy-Con напрямую: используй Chrome и скрипт запуска (не ссылку).', padPro: 'Pro Controller', padLight: 'огонёк {n}', padShaken: 'потрясли!',
     min5: '5 мин', clapJail: 'Хлопайте, чтобы быстрее освободить мышей из тюрьмы!',
     bulbs: ['головку чеснока', 'головки чеснока', 'головок чеснока']
@@ -695,7 +756,7 @@ const S = {
     lampsT: 'Ліхтарі та кішка', lampsD: 'Вуличні ліхтарі то вмикаються, то гаснуть, і в їхньому світлі кажан летить повільніше. Якщо підлетіти до кішки надто близько, вона нявкне й покличе сторожа.',
     thPlayer: 'Гравець', thWake: 'Розбудити', thFly: 'Летіти', thEcho: 'Ехолокація',
     click: 'Клацання', moveMouse: 'Рухати мишею', rightClickOr: 'Правий клік або', keySpace: 'Пробіл', arrowKeys: 'Стрілки',
-    pad: 'Joy-Con / геймпад', anyButton: 'Потруси!', stick: 'Стік', faceButton: 'Будь-яка з чотирьох кнопок',
+    pad: 'Joy-Con / геймпад', anyButton: 'Потруси!', stick: 'Нахиляй Joy-Con', faceButton: 'Будь-яка кнопка',
     note: 'Ехолокація посилає звукові хвилі до найближчого до твого кажана часнику й позначає його. Шкала ехолокації над кажаном світиться, коли вона знову готова. Підлети до товариша й натисни «Передати», щоб віддати йому часник. Коли кажан у в’язниці, глядачі можуть плескати (або натискати C), щоб звільнити його швидше. Втратиш усі 3 життя — сторож віднесе кажана до в’язниці (праворуч унизу) на 20 секунд; товариші біля дверей в’язниці звільнять усіх швидше. Кажани, які на світанку ще поза замком, розсипаються на порох. Кажан, який 25 секунд не рухається, знову засинає.',
     escBack: '— повернутися сюди.',
     roundLength: 'Тривалість раунду', min3: '3 хв', sec90: '90 с', sound: 'Звук', on: 'Увімк.', off: 'Вимк.', language: 'Мова',
@@ -721,11 +782,11 @@ const S = {
     yuck: 'фу!', golden: '+3 золотий!', whoosh: 'вжух! +1', nightShift: 'Нічна зміна: ще один сторож!',
     rooster: 'Кукуріку! Назад до замку!', allGone: 'Увесь часник викрадено! Тримайтеся…', mwahaha: 'МУА-ХА-ХА!',
     allCaught: 'Усіх кажанів спіймано!', meow: 'Няв!', sunPoof: 'Сонце зійшло! Пуф…', sunSafe: 'Сонце зійшло! Усі встигли до замку.',
-    thPass: 'Передати часник', passMouse: 'F або середня кнопка миші', passKeys2: 'Правий Shift або /', shoulder: 'Бічна кнопка SL / SR', crowd: 'Оплески глядачів', micOpt: 'Мікрофон', sensitivity: 'Чутливість', sensLow: 'Низька', sensMed: 'Середня', sensHigh: 'Висока', micStarting: 'Запитуємо мікрофон…', micOn: 'Слухаємо. Плескайте гучно, щоб звільнити кажанів із в’язниці!', micDenied: 'Мікрофон заблоковано. Дозвольте його в адресному рядку браузера або використовуйте клавішу C чи кнопку оплесків.', micUnavailable: 'Мікрофон не знайдено. Використовуйте клавішу C або кнопку оплесків.', clapBtn: 'Плесь!', clapLabel: 'Шкала оплесків глядачів', clapLeft: 'ще +{n} с', jarLabel: 'Спалено {n} з {total} головок часнику', sunLabel: 'Світанок через {t}',
+    thPass: 'Передати часник', passMouse: 'F або середня кнопка миші', passKeys2: 'Правий Shift або /', shoulder: 'Будь-яка кнопка (з часником)', crowd: 'Оплески глядачів', micOpt: 'Мікрофон', sensitivity: 'Чутливість', sensLow: 'Низька', sensMed: 'Середня', sensHigh: 'Висока', micStarting: 'Запитуємо мікрофон…', micOn: 'Слухаємо. Плескайте гучно, щоб звільнити кажанів із в’язниці!', micDenied: 'Мікрофон заблоковано. Дозвольте його в адресному рядку браузера або використовуйте клавішу C чи кнопку оплесків.', micUnavailable: 'Мікрофон не знайдено. Використовуйте клавішу C або кнопку оплесків.', clapBtn: 'Плесь!', clapLabel: 'Шкала оплесків глядачів', clapLeft: 'ще +{n} с', jarLabel: 'Спалено {n} з {total} головок часнику', sunLabel: 'Світанок через {t}',
     tutTitle: 'Як грати', tut0: 'Лети до часнику!', tut1: 'Зависни над ним, щоб схопити', tut2: 'Спали його у вогні замку!', tut3: 'Не потрапляй у світло ліхтаря!', tutSkip: 'Натисни будь-яку кнопку, щоб пропустити', tutorial: 'Навчання', tutGo: 'Уперед!', starsLabel: '{n} з 3 зірок',
     style: 'Стиль', stylePainted: 'Мальований', styleClean: 'Чистий',
     chipCaged: 'у клітці {n} с', tagCaged: 'Клітка {n} с', freeFriend: '{name} у в’язниці! Лети до дверей в’язниці й звільни', jailbreak: 'Втеча з в’язниці!', freed: '{name} на волі!',
-    padCheck: 'Перевірка контролерів', padHint: 'Рухайте кожен стік і натискайте кнопки: крапка й цифри показують, яким кажаном керує контролер. Два Joy-Con, об’єднані Chrome, видно як ліву й праву половини.', padNone: 'не підключено: натисніть кнопку на контролері', padLeftHalf: 'лівий Joy-Con', padRightHalf: 'правий Joy-Con', padRaw: 'Chrome бачить геймпадів: {n}:', padHeld: 'Joy-Con тримають', padSideways: 'Боком', padUpright: 'Вертикально', padDone: 'Готово',
+    padCheck: 'Перевірка контролерів', padHint: 'Рухайте кожен стік і натискайте кнопки: крапка й цифри показують, яким кажаном керує контролер. Два Joy-Con, об’єднані Chrome, видно як ліву й праву половини.', padNone: 'не підключено: натисніть кнопку на контролері', padLeftHalf: 'лівий Joy-Con', padRightHalf: 'правий Joy-Con', padRaw: 'Chrome бачить геймпадів: {n}:', padHeld: 'Joy-Con тримають', padSideways: 'Боком', padUpright: 'Як пульт', chipLost: 'немає зв’язку', padDone: 'Готово', tiltSens: 'Чутливість нахилу', padSteer: 'Політ', padTilt: 'Нахилом', padStick: 'Стіком', padFlipX: 'Перевернути ↔', padFlipY: 'Перевернути ↕', padRecenter: 'Вирівняти', padTiltHintSide: 'Тримайте кожен Joy-Con горизонтально двома руками, стік ліворуч. Нахил верхнього краю від себе — летіти вгору, до себе — вниз; опустіть правий кінець — праворуч, лівий — ліворуч. Якщо напрямок переплутано, натисніть «Перевернути». Натискання на стік робить поточний нахил «прямим».', padTiltHint: 'Тримайте кожен Joy-Con як пульт, спрямований на екран: майже горизонтально, кнопками вгору. Опустіть ніс — летіти вгору, підніміть — вниз, нахиляйте ліворуч і праворуч, щоб кермувати. Якщо напрямок переплутано, натисніть «Перевернути» (для всіх лівих або всіх правих Joy-Con). Натискання на стік робить поточний нахил «прямим».',
     padConnect: 'Підключити Joy-Con', padConnectHint: 'Chrome спитає про кожен Joy-Con: вибери один, натисни «Підключити», повтори. Потім вони підключаються самі.', padNoHid: 'Цей браузер не може підключити Joy-Con напряму: використовуй Chrome і скрипт запуску (не посилання).', padPro: 'Pro Controller', padLight: 'вогник {n}', padShaken: 'потрусили!',
     min5: '5 хв', clapJail: 'Плескайте, щоб швидше звільнити кажанів із в’язниці!',
     bulbs: ['головку часнику', 'головки часнику', 'головок часнику']
@@ -894,13 +955,28 @@ const NINTENDO = 0x057e, LEFT = 0x2006, RIGHT = 0x2007, PRO = 0x2009;
 const LIGHTS = [0x01, 0x02, 0x04, 0x08];         // player light 1..4 (one LED each)
 const NEUTRAL_RUMBLE = [0x00, 0x01, 0x40, 0x40];
 
+const TILT_SENS = { low: [.19, 1.0, 1.7], medium: [.14, .7, 1.4], high: [.1, .5, 1.2] };
+
 class JoyConHub {
   constructor() {
-    this.list = [];        // connected Joy-Cons, in the order they were connected (= Pad 1..4)
+    // four seats (Pad 1..4). A Joy-Con keeps its seat: if one drops out for a moment, the others do NOT move up
+    // a seat (that would hand them a different bat), and when it comes back it gets its own seat again
+    this.seats = [null, null, null, null]; this.seatDev = [null, null, null, null];
     this.counter = 0;
     this.supported = !!(navigator.hid && window.isSecureContext);
     this.onChange = null;
+    // tilt steering: which way is which differs between the left and right Joy-Con chips, so each side / grip
+    // can be flipped in the controller check (remembered in this browser)
+    this.flips = {}; try { this.flips = JSON.parse(localStorage.getItem('vgh-tilt-flips2') || '{}'); } catch (e) {}
+    this.sens = 'medium'; try { this.sens = localStorage.getItem('vgh-tilt-sens') || 'medium'; } catch (e) {}
   }
+  flip(key, axis) {
+    const f = this.flips[key] = this.flips[key] || { x: false, y: false }; f[axis] = !f[axis];
+    try { localStorage.setItem('vgh-tilt-flips2', JSON.stringify(this.flips)); } catch (e) {}
+  }
+  // "this is how I hold it": the current angle becomes straight ahead (after a short wait so the shake has settled)
+  get list() { return this.seats.filter(Boolean); }
+  recenter(i, delay = 0) { const j = this.seats[i]; if (j) j.recenterAt = performance.now() + delay; }
   async init() {
     if (!this.supported) return;
     navigator.hid.addEventListener('connect', e => this.open(e.device));
@@ -918,10 +994,14 @@ class JoyConHub {
   }
   async open(dev) {
     if (dev.vendorId !== NINTENDO || ![LEFT, RIGHT, PRO].includes(dev.productId)) return;
-    if (this.list.some(j => j.dev === dev)) return;
+    if (this.seats.some(j => j && j.dev === dev)) return;
+    let seat = this.seatDev.findIndex((d, i) => d === dev && !this.seats[i]);
+    if (seat < 0) seat = this.seats.findIndex((j, i) => !j && !this.seatDev[i]);
+    if (seat < 0) seat = this.seats.findIndex(j => !j);
+    if (seat < 0) return; // already four Joy-Cons
     const j = { dev, side: dev.productId === LEFT ? 'L' : dev.productId === RIGHT ? 'R' : 'P', name: dev.productName,
-      lx: 0, ly: 0, rx: 0, ry: 0, btn: 0, prevBtn: 0, g: 1, motion: 0, spikes: [], shakeQueued: false, center: null, last: 0, battery: 0 };
-    this.list.push(j);
+      lx: 0, ly: 0, rx: 0, ry: 0, gv: null, zero: null, recenterAt: 0, btn: 0, prevBtn: 0, g: 1, motion: 0, spikes: [], shakeQueued: false, center: null, last: 0, battery: 0 };
+    j.seat = seat; this.seats[seat] = j; this.seatDev[seat] = dev;
     try {
       if (!dev.opened) await dev.open();
       dev.addEventListener('inputreport', e => this.report(j, e));
@@ -933,7 +1013,7 @@ class JoyConHub {
     if (this.onChange) this.onChange();
   }
   drop(dev) {
-    this.list = this.list.filter(j => j.dev !== dev);
+    this.seats = this.seats.map(j => j && j.dev === dev ? null : j);
     this.lights();
     if (this.onChange) this.onChange();
   }
@@ -944,10 +1024,19 @@ class JoyConHub {
     await j.dev.sendReport(0x01, data);
     await new Promise(res => setTimeout(res, 30)); // give the Joy-Con a moment between commands
   }
-  lights() { this.list.forEach((j, i) => { this.sub(j, 0x30, [LIGHTS[i] || 0x0f]).catch(() => {}); }); }
+  lights() { this.seats.forEach((j, i) => { if (j) this.sub(j, 0x30, [LIGHTS[i] || 0x0f]).catch(() => {}); }); }
+  // a Joy-Con that stops sending its full reports (Bluetooth hiccup, or it fell back to its simple mode):
+  // switch full reports and the motion sensor on again
+  async kick(j) {
+    try {
+      if (!j.dev.opened) await j.dev.open();
+      await this.sub(j, 0x03, [0x30]); await this.sub(j, 0x40, [0x01]);
+      this.sub(j, 0x30, [LIGHTS[j.seat] || 0x0f]).catch(() => {});
+    } catch (e) { /* try again later */ }
+  }
 
   report(j, e) {
-    if (e.reportId !== 0x30) return;
+    if (e.reportId !== 0x30) { j.other = performance.now(); return; }
     const d = e.data, b = i => d.getUint8(i);
     j.battery = b(1) >> 5;
     j.btn = b(2) | (b(3) << 8) | (b(4) << 16);   // right byte, shared byte, left byte
@@ -963,6 +1052,9 @@ class JoyConHub {
       const gyro = Math.hypot(d.getInt16(o + 6, true), d.getInt16(o + 8, true), d.getInt16(o + 10, true));
       const g = Math.hypot(ax, ay, az) / 4096;
       j.g = g;
+      // gravity, smoothed: samples taken while the Joy-Con is being swung or shaken are left out
+      if (!j.gv) j.gv = [ax / 4096, ay / 4096, az / 4096];
+      else if (g > .6 && g < 1.45) { const k = .07; j.gv[0] += (ax / 4096 - j.gv[0]) * k; j.gv[1] += (ay / 4096 - j.gv[1]) * k; j.gv[2] += (az / 4096 - j.gv[2]) * k; }
       // a shake = two hard jolts within 0.7 s (one bump on the table doesn't count)
       if (g > 2.1 || gyro > 14000) {
         if (!j.spikes.length || now - j.spikes[j.spikes.length - 1] > 120) j.spikes.push(now);
@@ -974,9 +1066,58 @@ class JoyConHub {
     j.last = now;
   }
 
-  // one state per Joy-Con for this frame; upright = held vertically instead of sideways
-  read(upright) {
-    return this.list.map((j, i) => {
+  // tilt angles (radians) of one Joy-Con: [left/right, forward/back]
+  angles(j, upright) {
+    if (!j.gv) return [0, 0];
+    // the right Joy-Con's motion chip sits the other way round: its y and z axes point the opposite way
+    const m = Math.hypot(...j.gv) || 1, inv = j.side === 'R' ? -1 : 1;
+    const gx = j.gv[0] / m, gy = inv * j.gv[1] / m, gz = inv * j.gv[2] / m;
+    const as = v => Math.asin(Math.max(-1, Math.min(1, v)));
+    if (upright) {
+      // held like a remote pointed at the screen: lying almost flat, buttons up, trigger end towards the screen.
+      // Roll it left / right = left / right; dip the nose = forward (up the screen), lift it = back
+      const sx = 1; // the accelerometer's x axis points to the trigger end
+      return [as(gy) * sx, Math.atan2(gz, gx * sx)];
+    }
+    // sideways, both hands, stick on the left: lower the right end = right, lower the left end = left;
+    // tip the top edge away from you = forward (up the screen), towards you = back.
+    // The rail sits on the right edge of a left Joy-Con and on the left edge of a right one.
+    return [as(gx) * (j.side === 'L' ? 1 : -1), j.side === 'L' ? Math.atan2(gz, -gy) : Math.atan2(gz, gy)];
+  }
+  tilt(j, upright) {
+    const now = performance.now(), wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
+    let [lat, fwd] = this.angles(j, upright);
+    const key = j.side + (upright ? 'p' : 's');
+    if (j.recenterAt && now >= j.recenterAt) {
+      j.recenterAt = 0;
+      const c = v => Math.max(-.35, Math.min(.35, v));
+      j.zero = { key, lat: c(lat), fwd: upright ? Math.max(.35, Math.min(1.9, fwd)) : fwd };
+    }
+    // straight ahead: what was stored at the last recentre, else held perfectly upright / sideways
+    const z = j.zero && j.zero.key === key ? j.zero : { lat: 0, fwd: upright ? 1.05 : .7 }; // default: pointing = nose up about 30 degrees; sideways = buttons tilted up about 40 degrees
+    lat = wrap(lat - z.lat); fwd = wrap(fwd - z.fwd);
+    // tilt sensitivity (settings): [angle that does nothing, angle for full speed (radians), curve]
+    //   low    ~11 deg nothing, ~57 deg full, soft start
+    //   medium ~8 deg nothing,  ~40 deg full
+    //   high   ~6 deg nothing,  ~29 deg full, quick
+    const [DEAD, FULL, CURVE] = TILT_SENS[this.sens] || TILT_SENS.medium;
+    const amt = a => Math.sign(a) * Math.pow(Math.max(0, Math.min(1, (Math.abs(a) - DEAD) / (FULL - DEAD))), CURVE);
+    const f = this.flips[key] || {};
+    let ax = amt(lat) * (f.x ? -1 : 1), ay = -amt(fwd) * (f.y ? -1 : 1);
+    const mg = Math.hypot(ax, ay); if (mg > 1) { ax /= mg; ay /= mg; }
+    // ease towards the new value so a shaky hand doesn't make the bat twitch
+    const k = .25; j.tx = (j.tx || 0) + (ax - (j.tx || 0)) * k; j.ty = (j.ty || 0) + (ay - (j.ty || 0)) * k;
+    return [Math.abs(j.tx) < .01 ? 0 : j.tx, Math.abs(j.ty) < .01 ? 0 : j.ty];
+  }
+
+  // one state per Joy-Con for this frame; upright = held vertically instead of sideways; tilt = steer by tilting
+  read(upright, tilt = true) {
+    const now = performance.now();
+    return this.seats.map((j, i) => {
+      if (!j) return null;
+      const lost = !j.last || now - j.last > 700;
+      if (lost && now - (j.kickAt || 0) > 1500) { j.kickAt = now; this.kick(j); }
+      if (lost && j.last) { j.btn = j.prevBtn = 0; } // don't keep flying on the last reading
       const has = m => (j.btn & m) !== 0, was = m => (j.prevBtn & m) !== 0, edge = m => has(m) && !was(m);
       let ax, ay, echo, pass;
       if (j.side === 'L') {
@@ -993,18 +1134,22 @@ class JoyConHub {
         echo = edge(0x01) || edge(0x02) || edge(0x04) || edge(0x08);
         pass = edge(0x40) || edge(0x80) || edge(0x400000) || edge(0x800000);
       }
+      if (edge(0x000400) || edge(0x000800)) j.recenterAt = performance.now(); // click the stick in: recentre the tilt
+      if (lost) { ax = 0; ay = 0; }
+      else if (tilt && j.side !== 'P') { [ax, ay] = this.tilt(j, upright); }
+      else if (tilt) this.tilt(j, upright);
       const any = (j.btn & ~j.prevBtn) !== 0, shake = j.shakeQueued;
       if (shake) j.shakeAt = performance.now();
       j.prevBtn = j.btn; j.shakeQueued = false;
-      const m = Math.hypot(ax, ay); if (m < .22) { ax = 0; ay = 0; } else if (m > 1) { ax /= m; ay /= m; }
+      const m = Math.hypot(ax, ay); if (m < (tilt && j.side !== 'P' ? .02 : .22)) { ax = 0; ay = 0; } else if (m > 1) { ax /= m; ay /= m; }
       const pressed = []; for (let k = 0; k < 24; k++) if (j.btn & (1 << k)) pressed.push(k);
-      return { ax, ay, echo, pass, any, shake, motion: j.motion, hid: true, side: j.side, name: j.name, pressed, battery: j.battery, light: i + 1, shakeAt: j.shakeAt || 0 };
+      return { ax, ay, echo, pass, any, shake, motion: j.motion, hid: true, side: j.side, name: j.name, pressed, battery: j.battery, lost, light: i + 1, shakeAt: j.shakeAt || 0, flipKey: j.side + (upright ? 'p' : 's') };
     });
   }
 
   // rumble: a short buzz (frequency in Hz, amplitude 0..1), encoded as in dekuNukem's notes
   rumble(i, dur, amp) {
-    const j = this.list[i]; if (!j) return;
+    const j = this.seats[i]; if (!j) return;
     const enc = (hf, lf, a) => {
       const fh = Math.round(Math.log2(hf / 10) * 32), fl = Math.round(Math.log2(lf / 10) * 32);
       const hfc = (fh - 0x60) * 4, lfc = fl - 0x40;
@@ -1757,7 +1902,7 @@ const MEL = [[69, null, 72, 69, 76, null, 74, 72, 71, null, 68, 71, 64, null, nu
 const BASS = [[45, 45, 40, 40, 45, 45, 40, 40], [45, 45, 41, 41, 40, 40, 45, 45]];
 
 class Sound {
-  constructor() { this.ac = null; this.on = true; this.music = false; this.step = 0; this.next = 0; this.tempo = 0; }
+  constructor() { this.ac = null; this.on = true; this.music = false; this.step = 0; this.next = 0; this.tempo = 0; this.ambT = {}; }
   init() {
     if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
     try {
@@ -1768,6 +1913,9 @@ class Sound {
       this.sg = ac.createGain(); this.sg.gain.value = 0.75; this.sg.connect(this.master);
       this.nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
       const d = this.nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      // village ambience: its own quiet bus, under the music
+      this.ag = ac.createGain(); this.ag.gain.value = 0.55; this.ag.connect(this.master);
+      this.startWind();
       setInterval(() => this.schedule(), 25);
     } catch (e) { this.ac = null; }
   }
@@ -1787,6 +1935,46 @@ class Sound {
     f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     s.connect(f); f.connect(g); g.connect(dest || this.sg); s.start(t); s.stop(t + dur + 0.05);
+  }
+  // ---- village at night -------------------------------------------------------------------------
+  // a soft, endless wind: looping noise through a low filter whose cutoff drifts slowly
+  startWind() {
+    const ac = this.ac, len = ac.sampleRate * 4, b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0);
+    let last = 0; for (let i = 0; i < len; i++) { last = last * .985 + (Math.random() * 2 - 1) * .015; d[i] = last * 6; } // brown-ish noise
+    const src = ac.createBufferSource(); src.buffer = b; src.loop = true;
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 380; f.Q.value = .7;
+    const g = ac.createGain(); g.gain.value = .16;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = .07; lg.gain.value = 160; lfo.connect(lg); lg.connect(f.frequency); lfo.start();
+    const lfo2 = ac.createOscillator(), lg2 = ac.createGain(); lfo2.frequency.value = .045; lg2.gain.value = .07; lfo2.connect(lg2); lg2.connect(g.gain); lfo2.start();
+    src.connect(f); f.connect(g); g.connect(this.ag); src.start();
+  }
+  // a sound placed somewhere left or right in the room
+  pan(x) { const p = this.ac.createStereoPanner ? this.ac.createStereoPanner() : null; if (!p) return this.ag; p.pan.value = x; p.connect(this.ag); return p; }
+  cricket(t) {
+    const dest = this.pan(Math.random() * 1.6 - .8), f = 4200 + Math.random() * 900, n = 2 + Math.floor(Math.random() * 3);
+    for (let k = 0; k < 2; k++) for (let i = 0; i < n; i++) this.tone(f, .035, 'sine', .03, t + k * .32 + i * .055, null, dest);
+  }
+  owl(t) {
+    const dest = this.pan(Math.random() < .5 ? -.6 : .6);
+    this.tone(400, .32, 'sine', .07, t, 370, dest); this.tone(410, .22, 'sine', .05, t + .45, 390, dest); this.tone(405, .55, 'sine', .07, t + .75, 350, dest);
+  }
+  dog(t) {
+    const dest = this.pan(Math.random() * 1.4 - .7);
+    [0, .28].forEach(d => { this.tone(520, .12, 'sawtooth', .025, t + d, 300, dest); this.noise(.1, 900, 500, .03, 2, t + d, dest); });
+  }
+  frog(t) { const dest = this.pan(Math.random() * 1.2 - .6); [0, .16].forEach(d => this.tone(140, .12, 'square', .02, t + d, 95, dest)); }
+  bell(t) { const dest = this.pan(-.3); [1, 2.76, 5.4].forEach((m, i) => this.tone(196 * m, 3.2 / (i + 1), 'sine', .035 / (i + 1), t, null, dest)); }
+  crackle(t) { const dest = this.pan(.75); for (let i = 0; i < 3; i++) this.noise(.03, 2500 + Math.random() * 2500, 1800, .05, 3, t + Math.random() * .3, dest); }
+  ambience() {
+    const t = this.ac.currentTime, A = this.ambT;
+    const due = (k, lo, hi, fn) => { if (A[k] === undefined) A[k] = t + lo * Math.random(); if (t >= A[k]) { fn(t + .02); A[k] = t + lo + Math.random() * (hi - lo); } };
+    due('cricket', .6, 2.2, x => this.cricket(x));
+    due('cricket2', 1.1, 3.4, x => this.cricket(x));
+    due('frog', 6, 14, x => this.frog(x));
+    due('owl', 16, 34, x => this.owl(x));
+    due('dog', 35, 70, x => this.dog(x));
+    due('bell', 70, 110, x => this.bell(x));
+    due('crackle', .8, 2.5, x => this.crackle(x));
   }
   play(name) {
     if (!this.ac) return; const t = this.now();
@@ -1827,7 +2015,9 @@ class Sound {
     }
   }
   schedule() {
-    if (!this.ac || !this.music) return;
+    if (!this.ac) return;
+    if (this.on) this.ambience();
+    if (!this.music) return;
     const ac = this.ac, eighth = 60 / (104 + 60 * this.tempo) / 2;
     if (this.next < ac.currentTime) this.next = ac.currentTime + .05;
     while (this.next < ac.currentTime + .15) {
@@ -1887,7 +2077,7 @@ class Game {
     this.state = 'menu'; this.time = 0; this.roundTime = 300;
     this.keys = new Set(); this.mouse = { x: 0, z: 0, last: -10, ndc: new THREE.Vector2() };
     this.joycons = new JoyConHub(); this.joycons.init();
-    this.prevPad = []; this.prevPadKey = []; this.padPlayers = []; this.padUpright = false; this.floats = []; this.parts = [];
+    this.prevPad = []; this.prevPadKey = []; this.padPlayers = []; this.padUpright = false; this.padTilt = true; this.floats = []; this.parts = [];
     this.hudT = 0; this.endTimer = 0; this.banner = null; this.dt = 1 / 60;
     this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._v = new THREE.Vector3(); // scratch objects for posing bones
     this.clapper = new ClapDetector(); this.clapUI = null; this.clapFlash = 0; this.clapBoost = 0;
@@ -2135,6 +2325,22 @@ class Game {
         const seats = buildJail(kit, null, hd).map(([lx, lz]) => toWorld(lx, 0, lz));
         const door = toWorld(0, 0, d / 2 + .95);
         this.jail = { x, z, seats, door: [door.x, door.z], rescue: [door.x, door.z - .35], rescueT: 0 };
+        // neon outline of the jail: switched on while a bat is locked up inside (or being carried there)
+        const outline = new THREE.Group(), OW = w + .25, OD = d + .25, OH = 2.55;
+        const core = new THREE.MeshBasicMaterial({ color: '#C9FFF0', transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false });
+        const halo = new THREE.MeshBasicMaterial({ color: '#9FE0C9', transparent: true, opacity: .35, blending: THREE.AdditiveBlending, depthWrite: false });
+        const edge = (len, px, py, pz, axis) => [[.05, core], [.17, halo]].forEach(([r, m]) => {
+          const e = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 8, 1, true), m); e.position.set(px, py, pz);
+          if (axis === 'x') e.rotation.z = Math.PI / 2; if (axis === 'z') e.rotation.x = Math.PI / 2; outline.add(e);
+        });
+        [-1, 1].forEach(a => [-1, 1].forEach(c => {
+          edge(OH, a * OW / 2, OH / 2, c * OD / 2, 'y');                  // corners
+          edge(OW, 0, a > 0 ? OH : .06, c * OD / 2, 'x');                 // front / back, top and bottom
+          edge(OD, a * OW / 2, c > 0 ? OH : .06, 0, 'z');                 // sides, top and bottom
+        }));
+        const floor = this.glowDisc('#9FE0C9', .5); floor.scale.set(OW + 2.2, 1, OD + 2.2); floor.position.y = .05; outline.add(floor);
+        outline.position.set(x, 0, z); outline.rotation.y = ry; outline.visible = false; s.add(outline);
+        this.jail.outline = outline; this.jail.outMats = [core, halo, floor.material];
         const occ = new THREE.Mesh(new THREE.BoxGeometry(w, 2, d), occMat); occ.position.set(x, 1, z); occ.updateMatrixWorld(true); this.occluders.push(occ);
         return;
       }
@@ -2709,8 +2915,24 @@ class Game {
     const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .85, depthWrite: false })); ring.position.y = .18;
     const zone = this.glowDisc(color, .22); zone.scale.setScalar(GRAB_R * 2.1); zone.position.y = -.01; ring.add(zone);
     const cage = null;
-    const carry = this.makeGarlic(false), carryGold = this.makeGarlic(true);
-    [carry, carryGold].forEach(c => { c.scale.setScalar(1.0); c.position.y = -.68; g.add(c); });
+    // the garlic a bat carries hangs from its feet, a little towards the camera so the bat's body never hides it,
+    // big and with a soft white glow behind it so you can see from across the room who has one
+    const carry = new THREE.Group(), carryGold = new THREE.Group();
+    const bulb = this.makeGarlic(false); bulb.scale.setScalar(1.1); carry.add(bulb);
+    const cglow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#FFF6DC', map: this.glowTex, transparent: true, opacity: .75, blending: THREE.AdditiveBlending, depthWrite: false }));
+    cglow.scale.setScalar(1.25); cglow.position.y = .16; carry.add(cglow); carry.userData.glow = cglow;
+    const feet = new THREE.Mesh(new THREE.CylinderGeometry(.02, .03, .5, 5), this.std('#2A2148')); feet.position.y = .5; carry.add(feet); // the bat's legs gripping the bulb
+        carry.visible = false; carryGold.visible = false; this.scene.add(carry);
+    // "that's me!": a beam of the bat's colour and rings on the ground, when you shake your Joy-Con
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(.55, .75, 7, 28, 1, true), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    beam.visible = false; this.scene.add(beam);
+    const idRingGeo = new THREE.RingGeometry(.8, 1.0, 40); idRingGeo.rotateX(-Math.PI / 2);
+    const idRings = [0, 1].map(() => { const m = new THREE.Mesh(idRingGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; this.scene.add(m); return m; });
+    // carrying garlic: an arrow on the ground next to the bat points the way to the fire
+    const ash = new THREE.Shape(); ash.moveTo(0, .55); ash.lineTo(.42, -.05); ash.lineTo(.16, -.05); ash.lineTo(.16, -.45); ash.lineTo(-.16, -.45); ash.lineTo(-.16, -.05); ash.lineTo(-.42, -.05); ash.closePath();
+    const ag = new THREE.ShapeGeometry(ash); ag.rotateX(-Math.PI / 2);
+    const fireArrow = new THREE.Mesh(ag, new THREE.MeshBasicMaterial({ color: '#FFB347', transparent: true, opacity: .9, depthWrite: false }));
+    fireArrow.visible = false; this.scene.add(fireArrow);
     this.scene.add(g); this.scene.add(ring);
     // echolocation: sound-wave arcs travel from the bat to the closest garlic, where a bouncing arrow and a pulsing ring mark it
     const waveGeo = new THREE.RingGeometry(.45, .6, 24, 1, Math.PI * .12, Math.PI * .76);
@@ -2726,13 +2948,14 @@ class Game {
     const bGlow = this.glowDisc(color, .8); bGlow.scale.setScalar(2.6); bGlow.position.y = .19;
     const beacon = new THREE.Group(); beacon.add(arrow); beacon.add(bRing); beacon.add(bGlow); beacon.visible = false; this.scene.add(beacon);
     const tag = document.createElement('div'); tag.className = 'tag';
-    tag.innerHTML = `<span class="nm" style="color:${color}"></span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span><span class="echo"><i></i><em>Echo</em></span><span class="grab" hidden></span><span class="passhint" hidden>${ICONS.pass}</span>`;
+    // name + hearts on one line, then ONE bubble that shows what this bat's button does right now (icons, no reading needed)
+    tag.innerHTML = `<span class="row"><span class="nm" style="color:${color}"></span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span></span><span class="echo"><b class="btn"></b><span class="aic"></span><i></i><em></em></span><span class="grab" hidden></span><span class="passhint" hidden></span>`;
     this.layer.appendChild(tag);
     const roof = slot < 3 ? { x: 11.9 + slot * 1.35, z: -8.1 } : { x: 11.9 + (slot - 3) * .95, z: 8.1 };
     return { slot, color, get name() { return batName(slot); }, state: 'sleep', x: roof.x, z: roof.z, vx: 0, vz: 0, roof, yaw: 0,
       carrying: null, grabT: 0, grabSpot: null, invulnT: 0, echo: null, echoCd: 0, idleT: 0, wakeT: 0, pulseT: 0, lives: LIVES,
-      g, wingL, wingR, eyes, rig, ring, cage, cageT: 0, rescueT: 0, carry, carryGold, beacon, arrow, bRing, bGlow, waves, inLamp: false, tag,
-      tagNm: tag.querySelector('.nm'), tagHearts: [...tag.querySelectorAll('.hearts i')], tagEcho: tag.querySelector('.echo'), tagEchoTxt: tag.querySelector('.echo em'),
+      g, wingL, wingR, eyes, rig, ring, cage, cageT: 0, rescueT: 0, carry, carryGold, beam, idRings, identT: 0, fireArrow, beacon, arrow, bRing, bGlow, waves, inLamp: false, tag,
+      tagNm: tag.querySelector('.nm'), tagHearts: [...tag.querySelectorAll('.hearts i')], tagEcho: tag.querySelector('.echo'), tagEchoTxt: tag.querySelector('.echo em'), tagAic: tag.querySelector('.echo .aic'),
       tagGrab: tag.querySelector('.grab'), tagPass: tag.querySelector('.passhint'), napT: 0, tagCache: {} };
   }
   makeBoss() {
@@ -2863,8 +3086,11 @@ class Game {
     // Joy-Cons connected directly (WebHID) come first, one Joy-Con = one bat, in the order they were connected.
     // Then other gamepads (Xbox, PlayStation...). Nintendo entries from the normal gamepad list are skipped while
     // Joy-Cons are connected directly, so a Joy-Con never drives two bats.
-    const hid = this.joycons.read(this.padUpright);
-    const players = [...hid.map(st => ({ hid: st })), ...this.padPlayersNow().filter(p => !(hid.length && /057e|Joy-Con|Pro Controller/i.test(p.gp.id)))].slice(0, 4);
+    const hid = this.joycons.read(this.padUpright, this.padTilt);
+    // Joy-Cons sit in fixed seats; other gamepads fill the seats that are still free
+    const anyHid = hid.some(Boolean);
+    const others = this.padPlayersNow().filter(p => !(anyHid && /057e|Joy-Con|Pro Controller/i.test(p.gp.id)));
+    const players = hid.map(st => st ? { hid: st } : (others.shift() || null)).slice(0, 4);
     this.padPlayers = players;
     const LEFT_BTNS = [4, 6, 8, 10, 12, 13, 14, 15], RIGHT_BTNS = [0, 1, 2, 3, 5, 7, 9, 11];
     const out = [];
@@ -2984,13 +3210,18 @@ class Game {
     this.bats.forEach(b => { if (b.carrying && !b.carrying.golden) n++; });
     return n;
   }
+  // shake your Joy-Con while your bat is awake: it lights up so you can find it
+  identify(b) {
+    if (b.identT > IDENT_T - .5) return;
+    b.identT = IDENT_T; this.rumble(b, .35, .5, .4); this.sound.play('squeak');
+  }
   wake(b) {
     if (this.state !== 'play' || b.state !== 'sleep' || b.lives <= 0) return;
     Object.assign(b, { state: 'active', wakeT: .8, idleT: 0, x: b.roof.x, z: b.roof.z + (b.roof.z < 0 ? 1 : -1), vx: 0, vz: 0, echoCd: 0, napT: 0, invulnT: 0, inLamp: false });
     this.collideHouses(b); // start next to the house, not inside it
     this.addIcon(b.x, FLY_Y + .8, b.z, 'sparkle', 40, 1.3, b);
     this.burst(b.x, FLY_Y, b.z, 14, [b.color, '#F6F1E7'], 3);
-    this.sound.play('yawn'); this.rumble(b, .25, .4, .2);
+    this.sound.play('yawn'); this.rumble(b, .25, .4, .2); b.identT = IDENT_T;
     if (!this.started) {
       this.started = true; this.showBanner(tr('stealBefore'), 2.5, '#F6F1E7', 'garlic');
       if (this.tutorialOn) { this.tutorial = { step: 0, t: 0 }; this.banner = null; }
@@ -3121,15 +3352,18 @@ class Game {
 
     if (this.state === 'play') pads.forEach((pd, i) => {
       if (!pd) return; const b = this.bats[3 + i];
-      if (b.state === 'sleep' && (pd.hid ? pd.shake : pd.any)) this.wake(b); // Joy-Con: shake it to wake the bat
-      else if (b.state === 'active' && pd.echo) this.tryEcho(b);
-      if (b.state === 'active' && pd.pass) this.tryPass(b); // shoulder buttons
+      if (b.state === 'sleep' && (pd.hid ? pd.shake : pd.any)) { this.wake(b); if (pd.hid) this.joycons.recenter(b.slot - 3, 900); } // Joy-Con: shake it to wake the bat; the way it is held a moment later is 'straight ahead'
+      // any button: carrying garlic = pass it to a teammate, otherwise = echolocation
+      else if (b.state === 'active' && (pd.echo || pd.pass || pd.any)) { if (b.carrying) this.tryPass(b); else this.tryEcho(b); }
+      if (b.state !== 'sleep' && pd.hid && pd.shake) this.identify(b); // "which one am I?" 
     });
+    this.bats.forEach(b => { if (b.identT > 0) b.identT = Math.max(0, b.identT - dt); });
 
     // the night shift: a third watchman
     const w3 = this.watchmen[2];
     if (!w3.active && this.started && (this.activeBats().length >= 3 || p >= THIRD_WATCHMAN_AT)) {
       Object.assign(w3, { active: true, x: w3.path[0][0], z: w3.path[0][1], seg: 1, mode: 'patrol' });
+      this.bats.forEach(o => { if (o.state === 'active') o.invulnT = Math.max(o.invulnT, 2.5); }); // a fresh watchman never grabs a bat the moment he starts
       if (!this.shiftDone) { this.shiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A', 'lantern'); this.sound.play('alarm'); }
     }
 
@@ -3137,6 +3371,7 @@ class Game {
     const w4 = this.watchmen[3];
     if (w4 && !w4.active && this.started && this.roundTime >= 240 && p >= FOURTH_WATCHMAN_AT) {
       Object.assign(w4, { active: true, x: w4.path[0][0], z: w4.path[0][1], seg: 1, mode: 'patrol' });
+      this.bats.forEach(o => { if (o.state === 'active') o.invulnT = Math.max(o.invulnT, 2.5); }); // a fresh watchman never grabs a bat the moment he starts
       if (!this.lateShiftDone) { this.lateShiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A', 'lantern'); this.sound.play('alarm'); }
     }
     this.updateWatchmen(dt, p, !this.started);
@@ -3433,16 +3668,57 @@ class Game {
           b.wingR.rotation.z = -1.25; b.wingL.rotation.z = 1.25; if (b.eyes) b.eyes.visible = false;
           b.ring.material.opacity = .35; b.g.visible = true;
         } else {
-          b.g.position.set(b.x, FLY_Y + Math.sin(t * 3 + b.slot) * .12, b.z);
-          b.g.rotation.set(0, b.yaw, 0);
-          const flap = Math.sin(t * (b.carrying ? 20 : 15) + b.slot) * .75;
+          // carrying garlic = heavy: slower, deeper wing beats, flying lower, body heaving up on each
+          // downstroke and sagging between them, nose pulled up, a little wobble from side to side
+          // the wing phase is advanced frame by frame: changing the flap speed then never makes the wings jump
+          const vdt = Math.min(.1, Math.max(0, t - (b.visT ?? t))); b.visT = t;
+          b.heavy = lerp(b.heavy || 0, b.carrying ? 1 : 0, 1 - Math.exp(-vdt * 2.8)); const hv = b.heavy;
+          b.flapPh = (b.flapPh ?? b.slot) + vdt * lerp(15, 8.5, hv);
+          const ph = b.flapPh;
+          const light = Math.sin(t * 3 + b.slot) * .12, heave = Math.sin(ph - 1.3) * .17 - .38;
+          b.g.position.set(b.x, FLY_Y + lerp(light, heave, hv), b.z);
+          b.g.rotation.order = 'YXZ';
+          b.g.rotation.set(-.22 * hv + Math.sin(ph - 1.3) * .06 * hv, b.yaw, Math.sin(t * 2.1 + b.slot) * .1 * hv);
+          const flap = Math.sin(ph) * lerp(.75, 1.05, hv);
           b.wingR.rotation.z = flap; b.wingL.rotation.z = -flap; if (b.eyes) b.eyes.visible = true;
           b.ring.material.opacity = .85;
           b.g.visible = !(b.invulnT > 0 && Math.floor(t * 8) % 2 === 0); // blinks while it can't be caught
         }
       }
       if (b.rig) this.poseBat(b, t);
-      b.carry.visible = !!b.carrying && !b.carrying.golden; b.carryGold.visible = !!b.carrying && b.carrying.golden;
+      const hold = !!b.carrying && !sleeping;
+      b.carry.visible = hold;
+      if (hold) {
+        const gp = b.g.position, sw = Math.sin(t * 4 + b.slot) * .22;
+        // hangs under the bat and swings behind its wing beats, like a weight on a string
+        const lag = Math.sin((b.flapPh ?? t * 8.5) - 2.4);
+        b.carry.position.set(gp.x + Math.sin(sw) * .18, gp.y - .72 + lag * .05, gp.z + .42);
+        b.carry.rotation.set(lag * .12, 0, sw);
+        b.carry.userData.glow.quaternion.copy(this.camera.quaternion);
+        b.carry.userData.glow.material.opacity = .6 + Math.sin(t * 5) * .15;
+      }
+      // arrow to the fire while carrying (gone once the fire is right there)
+      const fdx = FURNACE.x - b.x, fdz = FURNACE.z - b.z, fd = Math.hypot(fdx, fdz);
+      const showArrow = hold && !caged && !carried && b.napT <= 0 && fd > 3.2;
+      b.fireArrow.visible = showArrow;
+      if (showArrow) {
+        b.fireArrow.position.set(b.x + fdx / fd * 2.05, .21, b.z + fdz / fd * 2.05);
+        b.fireArrow.rotation.y = Math.atan2(fdx, fdz) + Math.PI; // the shape points along -z before turning
+        b.fireArrow.material.opacity = .65 + Math.sin(t * 6) * .25;
+      }
+      // "that's me": beam + rings, fading out
+      const id = b.identT > 0 ? b.identT / IDENT_T : 0;
+      b.beam.visible = id > 0;
+      if (id > 0) {
+        const gp = b.g.position, fadeIn = Math.min(1, (IDENT_T - b.identT) / .15);
+        b.beam.position.set(gp.x, 3.5, gp.z); b.beam.material.opacity = .34 * Math.min(id * 2, 1) * fadeIn * (.85 + Math.sin(t * 14) * .15);
+      }
+      b.idRings.forEach((r, i) => {
+        const u = ((IDENT_T - b.identT) * 1.3 + i * .5) % 1;
+        r.visible = id > 0; if (!r.visible) return;
+        const gp = b.g.position; r.position.set(gp.x, .2, gp.z); r.scale.setScalar(.6 + u * 2.6); r.material.opacity = (1 - u) * .9 * Math.min(id * 2, 1);
+      });
+      b.tag.classList.toggle('ident', id > 0);
       // echolocation beacon over the closest garlic + sonar ripple at the bat
       if (b.echo && b.echo.spot) {
         const s = b.echo.spot, et = b.echo.t, fade = et > ECHO_DUR - .5 ? (ECHO_DUR - et) / .5 : Math.min(1, et / .2);
@@ -3469,24 +3745,35 @@ class Game {
       const nm = out ? tr('tagOut', { name: b.name }) : sleeping ? tr('tagSleep', { name: b.name }) : b.name;
       if (cache.nm !== nm) { cache.nm = nm; b.tagNm.textContent = nm; b.tag.classList.toggle('sleep', sleeping); b.tag.classList.toggle('out', out); }
       if (cache.lives !== b.lives) { cache.lives = b.lives; b.tagHearts.forEach((hEl, i) => hEl.classList.toggle('lost', i >= b.lives)); }
-      const locked = !!b.carrying && !caged && !carried; // carrying garlic: echo is switched off (shown greyed)
-      const ready = !caged && !carried && !locked && b.echoCd <= 0 && b.wakeT <= 0 && b.napT <= 0, echoTxt = sleeping ? '' : caged || carried ? tr('tagCaged', { n: Math.max(0, Math.ceil(b.cageT)) }) : b.napT > 0 ? 'zzz' : ready || (locked && b.echoCd <= 0) ? tr('tagEchoReady') : tr('tagEcho', { n: Math.max(1, Math.ceil(Math.max(b.echoCd, b.wakeT))) });
-      if (cache.echo !== echoTxt || cache.locked !== locked || cache.ready !== ready) { cache.echo = echoTxt; cache.locked = locked; cache.ready = ready; b.tagEcho.hidden = sleeping; b.tagEchoTxt.textContent = echoTxt; b.tagEcho.classList.toggle('ready', ready); b.tagEcho.classList.toggle('locked', locked); }
-      if (!ready && !sleeping) b.tagEcho.style.setProperty('--p', (caged || carried ? 1 - b.cageT / CAGE_TIME : 1 - b.echoCd / ECHO_CD).toFixed(3));
-      const napping = b.napT > 0;
-      const gp = caged ? b.rescueT / RESCUE_TIME : carried ? 0 : napping ? 1 - b.napT / NAP_TIME : b.grabT > 0 ? b.grabT / GRAB_TIME : 0;
-      b.tagGrab.hidden = gp <= 0; b.tagGrab.classList.toggle('nap', napping); if (gp > 0) b.tagGrab.style.setProperty('--p', gp.toFixed(3));
-      const canPass = !sleeping && !napping && !!b.carrying && !!this.passTarget(b);
-      if (cache.pass !== canPass) { cache.pass = canPass; b.tagPass.hidden = !canPass; }
+      // the bubble under the name says, in pictures, what pressing a button does right now:
+      //   echo icon (find garlic) · pass icon (a friend is close) · flame (bring it to the fire) · zzz · cage + seconds
+      const napping = b.napT > 0, canPass = !sleeping && !napping && !!b.carrying && !!this.passTarget(b);
+      const cooling = !b.carrying && (b.echoCd > 0 || b.wakeT > 0);
+      const mode = sleeping ? 'none' : caged || carried ? 'cage' : napping ? 'nap' : canPass ? 'pass' : b.carrying ? 'fire' : cooling ? 'cool' : 'echo';
+      const num = mode === 'cage' ? String(Math.max(0, Math.ceil(b.cageT))) : '';
+      if (cache.mode !== mode || cache.num !== num) {
+        if (cache.mode !== mode) {
+          b.tagAic.innerHTML = { echo: ICONS.echo, pass: ICONS.pass, fire: ICONS.flame, nap: ICONS.zzz, cage: ICONS.cage, cool: ICONS.echo, none: '' }[mode];
+          b.tagEcho.className = 'echo m-' + mode; b.tagEcho.hidden = mode === 'none';
+        }
+        cache.mode = mode; cache.num = num; b.tagEchoTxt.textContent = num;
+      }
+      if (mode === 'cool') b.tagEcho.style.setProperty('--p', (1 - Math.max(b.echoCd / ECHO_CD, b.wakeT / .8)).toFixed(3));
+      else if (mode === 'cage') b.tagEcho.style.setProperty('--p', (1 - b.cageT / CAGE_TIME).toFixed(3));
+      const gp = caged ? b.rescueT / RESCUE_TIME : carried ? 0 : b.grabT > 0 ? b.grabT / GRAB_TIME : 0;
+      b.tagGrab.hidden = gp <= 0; if (gp > 0) b.tagGrab.style.setProperty('--p', gp.toFixed(3));
     });
 
     // the jail: a mint ring at the door shows where to fly to break your friends out
     if (this.jail) {
       const J = this.jail, n = this.bats.filter(b => b.state === 'caged').length;
       J.ring.visible = J.glow.visible = n > 0 && this.state === 'play';
+      const inJail = this.bats.some(b => b.state === 'caged' || b.state === 'carried') && this.state === 'play';
+      J.outline.visible = inJail;
+      if (inJail) { const pl = .75 + Math.sin(t * 3.2) * .25; J.outMats[0].opacity = .95 * pl; J.outMats[1].opacity = .38 * pl; J.outMats[2].opacity = .45 * pl; }
       if (n > 0) { const pulse = Math.sin(t * 5); J.ring.material.opacity = .55 + pulse * .3; J.ring.scale.setScalar(1 + pulse * .03); J.glow.material.opacity = .25 + J.rescueT / RESCUE_TIME * .5; }
-      J.tag.hidden = !(n > 0 && this.state === 'play');
-      if (n > 0) {
+      J.tag.hidden = !(n > 0 && this.state === 'play' && J.rescueT > 0); // only while a friend is breaking them out: the caged bat's own tag already shows its timer
+      if (!J.tag.hidden) {
         const [sx, sy] = this.toScreen(J.x, 2.9, J.z);
         J.tag.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
         J.tag.style.setProperty('--p', (J.rescueT / RESCUE_TIME).toFixed(3)); J.tag.classList.toggle('helping', !!J.rescuing);
@@ -3544,7 +3831,7 @@ class Game {
       tutorial: this.tutorial ? { step: this.tutorial.step, t: this.tutorial.t } : null, jailed: this.bats.filter(b => b.state === 'caged').length, clapping: this.clapFlash > 0, mic: this.clapper.status, clapLeft: Math.max(0, CLAP_MAX - this.clapBoost), total: this.remaining() + this.burned,
       count: this.state === 'countdown' ? Math.max(1, Math.ceil(this.cdT)) : 0,
       awake: this.bats.filter(b => b.state === 'active' || b.state === 'caged' || b.state === 'carried').length,
-      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active' || b.state === 'caged' || b.state === 'carried', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, napping: b.napT > 0, caged: b.state === 'caged' || b.state === 'carried', cageLeft: Math.max(0, Math.ceil(b.cageT)), echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0, echoLocked: !!b.carrying })),
+      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active' || b.state === 'caged' || b.state === 'carried', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, napping: b.napT > 0, lost: b.slot >= 3 && b.state === 'active' && (!this.padState || !this.padState[b.slot - 3] || !!this.padState[b.slot - 3].lost), caged: b.state === 'caged' || b.state === 'carried', cageLeft: Math.max(0, Math.ceil(b.cageT)), echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0, echoLocked: !!b.carrying })),
       backend: this.backend
     };
   }
@@ -3579,7 +3866,8 @@ function CrowdOptions({ mic, setMic, sens, setSens, micStatus }) {
     msg ? h('p', { className: 'micmsg ' + msg[0], role: 'status' }, msg[1]) : null);
 }
 
-function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart, crowd, tut, setTut, painted, setPaintedStyle, openPads }) {
+const TiltSensSeg = ({ value, onChange }) => h(Seg, { label: t('tiltSens'), value, onChange, options: [{ v: 'low', label: t('sensLow') }, { v: 'medium', label: t('sensMed') }, { v: 'high', label: t('sensHigh') }] });
+function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart, crowd, tut, setTut, painted, setPaintedStyle, openPads, tiltSens, setTiltSens }) {
   return h('div', { className: 'overlay' }, h(MenuBats), h('div', { className: 'card' },
     h('div', { className: 'options' },
       h(Seg, { label: t('language'), value: lang, onChange: changeLang, options: LANGS.map(l => ({ v: l.id, label: l.label, lang: l.id })) })),
@@ -3601,6 +3889,7 @@ function Menu({ ready, backend, error, roundTime, setRoundTime, sound, setSound,
       h(Seg, { label: t('roundLength'), value: roundTime, onChange: setRoundTime, options: [{ v: 300, label: t('min5') }, { v: 180, label: t('min3') }] }),
       h(Seg, { label: t('sound'), value: sound, onChange: setSound, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] }),
       h(Seg, { label: t('tutorial'), value: tut, onChange: setTut, options: [{ v: true, label: t('on') }, { v: false, label: t('off') }] }),
+      h(TiltSensSeg, { value: tiltSens, onChange: setTiltSens }),
       h(Seg, { label: t('style'), value: painted, onChange: setPaintedStyle, options: [{ v: true, label: t('stylePainted') }, { v: false, label: t('styleClean') }] })),
     h(CrowdOptions, crowd),
     error ? h('p', { className: 'note', style: { color: 'var(--coral)' } }, t('noRenderer')) : null,
@@ -3652,7 +3941,7 @@ function Tutorial({ tu }) {
     h('p', { className: 'tut-skip' }, t('tutSkip'))));
 }
 // controller check: shows what Chrome sees and which bat each controller drives
-function PadCheck({ game, onClose, upright, setUpright }) {
+function PadCheck({ game, onClose, upright, setUpright, tilt, setTilt, tiltSens, setTiltSens }) {
   const [, tick] = useState(0), [msg, setMsg] = useState('');
   const connect = async () => { const r = await game.joycons.request(); setMsg(r === 'unsupported' ? t('padNoHid') : ''); };
   useEffect(() => { game.padCheckOpen = true; const id = setInterval(() => tick(n => n + 1), 80); return () => { clearInterval(id); game.padCheckOpen = false; }; }, [game]);
@@ -3660,7 +3949,7 @@ function PadCheck({ game, onClose, upright, setUpright }) {
   let raw = []; try { raw = Array.from(navigator.getGamepads ? navigator.getGamepads() : []).filter(Boolean); } catch (e) {}
   return h('div', { className: 'overlay padcheck-wrap' }, h('div', { className: 'card padcheck', role: 'dialog', 'aria-label': t('padCheck') },
     h('h2', null, t('padCheck')),
-    h('p', { className: 'note' }, t('padHint')),
+    h('p', { className: 'note' }, tilt ? (upright ? t('padTiltHint') : t('padTiltHintSide')) : t('padHint')),
     h('div', { className: 'actions' }, h('button', { type: 'button', className: 'ghost', onClick: connect }, t('padConnect')), h('span', { className: 'small' }, game.joycons.supported ? t('padConnectHint') : t('padNoHid'))),
     msg ? h('p', { className: 'micmsg bad' }, msg) : null,
     h('div', { className: 'pc-list' }, [0, 1, 2, 3].map(i => {
@@ -3671,12 +3960,19 @@ function PadCheck({ game, onClose, upright, setUpright }) {
         h('div', { className: 'pc-stick' }, h('i', { style: st ? { left: `${50 + st.ax * 40}%`, top: `${50 + st.ay * 40}%` } : null })),
         p && p.hid ? h('span', { className: 'pc-id' }, `${t(p.hid.side === 'L' ? 'padLeftHalf' : p.hid.side === 'R' ? 'padRightHalf' : 'padPro')} · ${t('padLight', { n: p.hid.light })}`,
           h('span', { className: 'pc-shake' + (performance.now() - p.hid.shakeAt < 700 ? ' hit' : '') }, h('i', { style: { transform: `scaleX(${(st && st.motion || 0).toFixed(2)})` } })),
-          performance.now() - p.hid.shakeAt < 700 ? h('b', { className: 'pc-shook' }, t('padShaken')) : null) :
+          performance.now() - p.hid.shakeAt < 700 ? h('b', { className: 'pc-shook' }, t('padShaken')) : null,
+          tilt && p.hid.side !== 'P' ? h('span', { className: 'pc-flip' },
+            h('button', { type: 'button', className: 'ghost small' + ((game.joycons.flips[p.hid.flipKey] || {}).x ? ' on' : ''), onClick: () => game.joycons.flip(p.hid.flipKey, 'x') }, t('padFlipX')),
+            h('button', { type: 'button', className: 'ghost small' + ((game.joycons.flips[p.hid.flipKey] || {}).y ? ' on' : ''), onClick: () => game.joycons.flip(p.hid.flipKey, 'y') }, t('padFlipY')),
+            h('button', { type: 'button', className: 'ghost small', onClick: () => game.joycons.recenter(i) }, t('padRecenter'))) : null) :
         h('span', { className: 'pc-id' }, p ? `${p.half ? (p.half === 'L' ? t('padLeftHalf') : t('padRightHalf')) + ' · ' : ''}${p.gp.id.replace(/\s*\(.*?Vendor.*\)/i, '')}` : t('padNone')),
         h('span', { className: 'pc-btns' }, st && st.pressed.length ? st.pressed.join(' ') : ''));
     })),
     h('p', { className: 'small' }, t('padRaw', { n: raw.length }), ' ', raw.map(g => `#${g.index}: ${g.id.slice(0, 40)}`).join(' | ')),
-    h('div', { className: 'options' }, h(Seg, { label: t('padHeld'), value: upright, onChange: setUpright, options: [{ v: false, label: t('padSideways') }, { v: true, label: t('padUpright') }] })),
+    h('div', { className: 'options' },
+      h(Seg, { label: t('padSteer'), value: tilt, onChange: setTilt, options: [{ v: true, label: t('padTilt') }, { v: false, label: t('padStick') }] }),
+      h(Seg, { label: t('padHeld'), value: upright, onChange: setUpright, options: [{ v: false, label: t('padSideways') }, { v: true, label: t('padUpright') }] }),
+      tilt ? h(TiltSensSeg, { value: tiltSens, onChange: setTiltSens }) : null),
     h('div', { className: 'actions' }, h('button', { type: 'button', className: 'big', onClick: onClose, autoFocus: true }, t('padDone')))));
 }
 // a few bats flapping across the menu
@@ -3764,8 +4060,13 @@ function Hud({ hud, game }) {
     h('div', { className: 'players' }, hud.players.map(p => h('div', { key: p.slot, className: 'chip' + (p.out ? ' out' : p.awake ? '' : ' sleep') },
       h('span', { className: 'chip-bat', style: { color: p.color }, 'aria-hidden': 'true', dangerouslySetInnerHTML: { __html: ICONS.bat } }), p.name,
       h('span', { className: 'hp', 'aria-label': t('livesLabel', { n: p.lives }) }, [0, 1, 2].map(i => i < p.lives ? h('span', { key: i }, '♥') : h('s', { key: i }, '♥'))),
-      p.caged ? h('span', { className: 'ec caged' }, t('chipCaged', { n: p.cageLeft })) : p.out ? ` ${t('chipOut')}` : p.napping ? h('span', { className: 'ec' }, 'zzz') : p.awake ? h('span', { className: 'ec' + (p.echoLocked ? ' locked' : p.echo ? '' : ' ready') }, p.echo ? t('chipEcho', { n: p.echo }) : t('chipEchoReady')) : ` ${t('chipAsleep')}`,
-      p.carrying ? ` · ${t('chipGarlic')}` : null))),
+      p.lost ? h('span', { className: 'ec lost' }, t('chipLost'))
+        : p.caged ? h('span', { className: 'st' }, h(Icon, { name: 'cage', className: 'ic' }), p.cageLeft)
+        : p.out ? ` ${t('chipOut')}`
+        : p.napping ? h('span', { className: 'st' }, h(Icon, { name: 'zzz', className: 'ic' }))
+        : !p.awake ? h('span', { className: 'st' }, h(Icon, { name: 'zzz', className: 'ic' }))
+        : p.carrying ? h('span', { className: 'st garlic', title: t('chipGarlic') }, h(Icon, { name: 'garlic', className: 'ic' }))
+        : h('span', { className: 'st ' + (p.echo ? 'cool' : 'ready'), title: p.echo ? t('chipEcho', { n: p.echo }) : t('chipEchoReady') }, h(Icon, { name: 'echo', className: 'ic' }), p.echo ? p.echo : null)))),
     hud.jailed > 0 && hud.state === 'play' ? h('div', { className: 'clap-jail', role: 'status' }, h(Icon, { name: 'clap' }), t('clapJail', { n: hud.jailed })) : null,
     h(ClapMeter, { game, hud }),
     h('div', { className: 'badge' }, hud.backend));
@@ -3785,8 +4086,11 @@ function App() {
     setMicStatus('starting'); setMicStatus(await g.clapper.enable());
   };
   const [tut, setTutState] = useState(true);
-  const [padCheck, setPadCheck] = useState(false), [upright, setUprightState] = useState(false);
+  const [padCheck, setPadCheck] = useState(false), [upright, setUprightState] = useState(false), [tilt, setTiltState] = useState(true);
   const setUpright = v => { setUprightState(v); if (gameRef.current) gameRef.current.padUpright = v; };
+  const setTilt = v => { setTiltState(v); if (gameRef.current) gameRef.current.padTilt = v; };
+  const [tiltSens, setTiltSensState] = useState(() => { try { return localStorage.getItem('vgh-tilt-sens') || 'medium'; } catch (e) { return 'medium'; } });
+  const setTiltSens = v => { setTiltSensState(v); try { localStorage.setItem('vgh-tilt-sens', v); } catch (e) {} if (gameRef.current && gameRef.current.joycons) gameRef.current.joycons.sens = v; };
   const [painted, setPaintedState] = useState(!new URLSearchParams(location.search).has('clean'));
   const setPaintedStyle = v => { setPaintedState(v); if (gameRef.current) gameRef.current.setStyle(v); };
   const setTut = v => { setTutState(v); if (gameRef.current) gameRef.current.tutorialOn = v; };
@@ -3808,8 +4112,8 @@ function App() {
     painted ? h('div', { className: 'grain', 'aria-hidden': 'true' }) : null,
     h('div', { ref: layerRef, className: 'layer', 'aria-hidden': 'true' }),
     screen !== 'menu' && screen !== 'end' ? h(Hud, { hud, game: gameRef.current }) : null,
-    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start, crowd: { mic, setMic, sens, setSens, micStatus }, tut, setTut, painted, setPaintedStyle, openPads: () => setPadCheck(true) }) : null,
-    screen === 'menu' && padCheck && gameRef.current ? h(PadCheck, { game: gameRef.current, onClose: () => setPadCheck(false), upright, setUpright }) : null,
+    screen === 'menu' ? h(Menu, { ready, backend, error, roundTime, setRoundTime, sound, setSound, lang, changeLang, onStart: start, crowd: { mic, setMic, sens, setSens, micStatus }, tut, setTut, painted, setPaintedStyle, openPads: () => setPadCheck(true), tiltSens, setTiltSens }) : null,
+    screen === 'menu' && padCheck && gameRef.current ? h(PadCheck, { game: gameRef.current, onClose: () => setPadCheck(false), upright, setUpright, tilt, setTilt, tiltSens, setTiltSens }) : null,
     screen === 'end' && result ? h(End, { r: result, onAgain: start, onMenu: () => gameRef.current.toMenu() }) : null);
 }
 

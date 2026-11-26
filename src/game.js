@@ -13,7 +13,7 @@ import { ClapDetector } from './clap.js';
 import { JoyConHub } from './joycon.js';
 import { Kit, buildCottage, buildChurch, buildMill, buildMillSails, buildField, buildGarlicGeometry, buildStreets, buildPlaza, buildTree, buildGraveyard, buildStall, buildLampPost, buildScatter, buildCastle as buildCastleKit, garlicFromModel, buildJail } from './buildings.js';
 import {
-  CASTLE_X, FURNACE, FLY_Y, GRAB_TIME, GRAB_R, MAXV, CARRY_V, ECHO_CD, ECHO_DUR, IDLE_SLEEP,
+  CASTLE_X, FURNACE, IDENT_T, FLY_Y, GRAB_TIME, GRAB_R, MAXV, CARRY_V, ECHO_CD, ECHO_DUR, IDLE_SLEEP,
   LIGHT_R0, LIGHT_R1, NOTICE, LAMP_R, LAMP_SLOW, NAP_TIME, PASS_R, WATCH_SPEEDUP, WATCH_SPEEDUP_MAX, CLAP_PUSH, CLAP_MAX, CAGE_TIME, CLAP_CAGE, FOURTH_WATCHMAN_AT, CAGE_LIVES, RESCUE_R, RESCUE_TIME, RESCUE_LIVES, THIRD_WATCHMAN_AT, ROOF_COLORS, BAT_COLORS,
   STREET_W, PLAZA, STREETS, HOUSES, PATHS, LAMPS, TREES, GRAVEYARD, STALLS, FIELDS, WORLD
 } from './config.js';
@@ -57,7 +57,7 @@ export class Game {
     this.state = 'menu'; this.time = 0; this.roundTime = 300;
     this.keys = new Set(); this.mouse = { x: 0, z: 0, last: -10, ndc: new THREE.Vector2() };
     this.joycons = new JoyConHub(); this.joycons.init();
-    this.prevPad = []; this.prevPadKey = []; this.padPlayers = []; this.padUpright = false; this.floats = []; this.parts = [];
+    this.prevPad = []; this.prevPadKey = []; this.padPlayers = []; this.padUpright = false; this.padTilt = true; this.floats = []; this.parts = [];
     this.hudT = 0; this.endTimer = 0; this.banner = null; this.dt = 1 / 60;
     this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._v = new THREE.Vector3(); // scratch objects for posing bones
     this.clapper = new ClapDetector(); this.clapUI = null; this.clapFlash = 0; this.clapBoost = 0;
@@ -305,6 +305,22 @@ export class Game {
         const seats = buildJail(kit, null, hd).map(([lx, lz]) => toWorld(lx, 0, lz));
         const door = toWorld(0, 0, d / 2 + .95);
         this.jail = { x, z, seats, door: [door.x, door.z], rescue: [door.x, door.z - .35], rescueT: 0 };
+        // neon outline of the jail: switched on while a bat is locked up inside (or being carried there)
+        const outline = new THREE.Group(), OW = w + .25, OD = d + .25, OH = 2.55;
+        const core = new THREE.MeshBasicMaterial({ color: '#C9FFF0', transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false });
+        const halo = new THREE.MeshBasicMaterial({ color: '#9FE0C9', transparent: true, opacity: .35, blending: THREE.AdditiveBlending, depthWrite: false });
+        const edge = (len, px, py, pz, axis) => [[.05, core], [.17, halo]].forEach(([r, m]) => {
+          const e = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 8, 1, true), m); e.position.set(px, py, pz);
+          if (axis === 'x') e.rotation.z = Math.PI / 2; if (axis === 'z') e.rotation.x = Math.PI / 2; outline.add(e);
+        });
+        [-1, 1].forEach(a => [-1, 1].forEach(c => {
+          edge(OH, a * OW / 2, OH / 2, c * OD / 2, 'y');                  // corners
+          edge(OW, 0, a > 0 ? OH : .06, c * OD / 2, 'x');                 // front / back, top and bottom
+          edge(OD, a * OW / 2, c > 0 ? OH : .06, 0, 'z');                 // sides, top and bottom
+        }));
+        const floor = this.glowDisc('#9FE0C9', .5); floor.scale.set(OW + 2.2, 1, OD + 2.2); floor.position.y = .05; outline.add(floor);
+        outline.position.set(x, 0, z); outline.rotation.y = ry; outline.visible = false; s.add(outline);
+        this.jail.outline = outline; this.jail.outMats = [core, halo, floor.material];
         const occ = new THREE.Mesh(new THREE.BoxGeometry(w, 2, d), occMat); occ.position.set(x, 1, z); occ.updateMatrixWorld(true); this.occluders.push(occ);
         return;
       }
@@ -879,8 +895,24 @@ export class Game {
     const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .85, depthWrite: false })); ring.position.y = .18;
     const zone = this.glowDisc(color, .22); zone.scale.setScalar(GRAB_R * 2.1); zone.position.y = -.01; ring.add(zone);
     const cage = null;
-    const carry = this.makeGarlic(false), carryGold = this.makeGarlic(true);
-    [carry, carryGold].forEach(c => { c.scale.setScalar(1.0); c.position.y = -.68; g.add(c); });
+    // the garlic a bat carries hangs from its feet, a little towards the camera so the bat's body never hides it,
+    // big and with a soft white glow behind it so you can see from across the room who has one
+    const carry = new THREE.Group(), carryGold = new THREE.Group();
+    const bulb = this.makeGarlic(false); bulb.scale.setScalar(1.1); carry.add(bulb);
+    const cglow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#FFF6DC', map: this.glowTex, transparent: true, opacity: .75, blending: THREE.AdditiveBlending, depthWrite: false }));
+    cglow.scale.setScalar(1.25); cglow.position.y = .16; carry.add(cglow); carry.userData.glow = cglow;
+    const feet = new THREE.Mesh(new THREE.CylinderGeometry(.02, .03, .5, 5), this.std('#2A2148')); feet.position.y = .5; carry.add(feet); // the bat's legs gripping the bulb
+        carry.visible = false; carryGold.visible = false; this.scene.add(carry);
+    // "that's me!": a beam of the bat's colour and rings on the ground, when you shake your Joy-Con
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(.55, .75, 7, 28, 1, true), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    beam.visible = false; this.scene.add(beam);
+    const idRingGeo = new THREE.RingGeometry(.8, 1.0, 40); idRingGeo.rotateX(-Math.PI / 2);
+    const idRings = [0, 1].map(() => { const m = new THREE.Mesh(idRingGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; this.scene.add(m); return m; });
+    // carrying garlic: an arrow on the ground next to the bat points the way to the fire
+    const ash = new THREE.Shape(); ash.moveTo(0, .55); ash.lineTo(.42, -.05); ash.lineTo(.16, -.05); ash.lineTo(.16, -.45); ash.lineTo(-.16, -.45); ash.lineTo(-.16, -.05); ash.lineTo(-.42, -.05); ash.closePath();
+    const ag = new THREE.ShapeGeometry(ash); ag.rotateX(-Math.PI / 2);
+    const fireArrow = new THREE.Mesh(ag, new THREE.MeshBasicMaterial({ color: '#FFB347', transparent: true, opacity: .9, depthWrite: false }));
+    fireArrow.visible = false; this.scene.add(fireArrow);
     this.scene.add(g); this.scene.add(ring);
     // echolocation: sound-wave arcs travel from the bat to the closest garlic, where a bouncing arrow and a pulsing ring mark it
     const waveGeo = new THREE.RingGeometry(.45, .6, 24, 1, Math.PI * .12, Math.PI * .76);
@@ -896,13 +928,14 @@ export class Game {
     const bGlow = this.glowDisc(color, .8); bGlow.scale.setScalar(2.6); bGlow.position.y = .19;
     const beacon = new THREE.Group(); beacon.add(arrow); beacon.add(bRing); beacon.add(bGlow); beacon.visible = false; this.scene.add(beacon);
     const tag = document.createElement('div'); tag.className = 'tag';
-    tag.innerHTML = `<span class="nm" style="color:${color}"></span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span><span class="echo"><i></i><em>Echo</em></span><span class="grab" hidden></span><span class="passhint" hidden>${ICONS.pass}</span>`;
+    // name + hearts on one line, then ONE bubble that shows what this bat's button does right now (icons, no reading needed)
+    tag.innerHTML = `<span class="row"><span class="nm" style="color:${color}"></span><span class="hearts" aria-label="lives"><i>♥</i><i>♥</i><i>♥</i></span></span><span class="echo"><b class="btn"></b><span class="aic"></span><i></i><em></em></span><span class="grab" hidden></span><span class="passhint" hidden></span>`;
     this.layer.appendChild(tag);
     const roof = slot < 3 ? { x: 11.9 + slot * 1.35, z: -8.1 } : { x: 11.9 + (slot - 3) * .95, z: 8.1 };
     return { slot, color, get name() { return batName(slot); }, state: 'sleep', x: roof.x, z: roof.z, vx: 0, vz: 0, roof, yaw: 0,
       carrying: null, grabT: 0, grabSpot: null, invulnT: 0, echo: null, echoCd: 0, idleT: 0, wakeT: 0, pulseT: 0, lives: LIVES,
-      g, wingL, wingR, eyes, rig, ring, cage, cageT: 0, rescueT: 0, carry, carryGold, beacon, arrow, bRing, bGlow, waves, inLamp: false, tag,
-      tagNm: tag.querySelector('.nm'), tagHearts: [...tag.querySelectorAll('.hearts i')], tagEcho: tag.querySelector('.echo'), tagEchoTxt: tag.querySelector('.echo em'),
+      g, wingL, wingR, eyes, rig, ring, cage, cageT: 0, rescueT: 0, carry, carryGold, beam, idRings, identT: 0, fireArrow, beacon, arrow, bRing, bGlow, waves, inLamp: false, tag,
+      tagNm: tag.querySelector('.nm'), tagHearts: [...tag.querySelectorAll('.hearts i')], tagEcho: tag.querySelector('.echo'), tagEchoTxt: tag.querySelector('.echo em'), tagAic: tag.querySelector('.echo .aic'),
       tagGrab: tag.querySelector('.grab'), tagPass: tag.querySelector('.passhint'), napT: 0, tagCache: {} };
   }
   makeBoss() {
@@ -1033,8 +1066,11 @@ export class Game {
     // Joy-Cons connected directly (WebHID) come first, one Joy-Con = one bat, in the order they were connected.
     // Then other gamepads (Xbox, PlayStation...). Nintendo entries from the normal gamepad list are skipped while
     // Joy-Cons are connected directly, so a Joy-Con never drives two bats.
-    const hid = this.joycons.read(this.padUpright);
-    const players = [...hid.map(st => ({ hid: st })), ...this.padPlayersNow().filter(p => !(hid.length && /057e|Joy-Con|Pro Controller/i.test(p.gp.id)))].slice(0, 4);
+    const hid = this.joycons.read(this.padUpright, this.padTilt);
+    // Joy-Cons sit in fixed seats; other gamepads fill the seats that are still free
+    const anyHid = hid.some(Boolean);
+    const others = this.padPlayersNow().filter(p => !(anyHid && /057e|Joy-Con|Pro Controller/i.test(p.gp.id)));
+    const players = hid.map(st => st ? { hid: st } : (others.shift() || null)).slice(0, 4);
     this.padPlayers = players;
     const LEFT_BTNS = [4, 6, 8, 10, 12, 13, 14, 15], RIGHT_BTNS = [0, 1, 2, 3, 5, 7, 9, 11];
     const out = [];
@@ -1154,13 +1190,18 @@ export class Game {
     this.bats.forEach(b => { if (b.carrying && !b.carrying.golden) n++; });
     return n;
   }
+  // shake your Joy-Con while your bat is awake: it lights up so you can find it
+  identify(b) {
+    if (b.identT > IDENT_T - .5) return;
+    b.identT = IDENT_T; this.rumble(b, .35, .5, .4); this.sound.play('squeak');
+  }
   wake(b) {
     if (this.state !== 'play' || b.state !== 'sleep' || b.lives <= 0) return;
     Object.assign(b, { state: 'active', wakeT: .8, idleT: 0, x: b.roof.x, z: b.roof.z + (b.roof.z < 0 ? 1 : -1), vx: 0, vz: 0, echoCd: 0, napT: 0, invulnT: 0, inLamp: false });
     this.collideHouses(b); // start next to the house, not inside it
     this.addIcon(b.x, FLY_Y + .8, b.z, 'sparkle', 40, 1.3, b);
     this.burst(b.x, FLY_Y, b.z, 14, [b.color, '#F6F1E7'], 3);
-    this.sound.play('yawn'); this.rumble(b, .25, .4, .2);
+    this.sound.play('yawn'); this.rumble(b, .25, .4, .2); b.identT = IDENT_T;
     if (!this.started) {
       this.started = true; this.showBanner(tr('stealBefore'), 2.5, '#F6F1E7', 'garlic');
       if (this.tutorialOn) { this.tutorial = { step: 0, t: 0 }; this.banner = null; }
@@ -1291,15 +1332,18 @@ export class Game {
 
     if (this.state === 'play') pads.forEach((pd, i) => {
       if (!pd) return; const b = this.bats[3 + i];
-      if (b.state === 'sleep' && (pd.hid ? pd.shake : pd.any)) this.wake(b); // Joy-Con: shake it to wake the bat
-      else if (b.state === 'active' && pd.echo) this.tryEcho(b);
-      if (b.state === 'active' && pd.pass) this.tryPass(b); // shoulder buttons
+      if (b.state === 'sleep' && (pd.hid ? pd.shake : pd.any)) { this.wake(b); if (pd.hid) this.joycons.recenter(b.slot - 3, 900); } // Joy-Con: shake it to wake the bat; the way it is held a moment later is 'straight ahead'
+      // any button: carrying garlic = pass it to a teammate, otherwise = echolocation
+      else if (b.state === 'active' && (pd.echo || pd.pass || pd.any)) { if (b.carrying) this.tryPass(b); else this.tryEcho(b); }
+      if (b.state !== 'sleep' && pd.hid && pd.shake) this.identify(b); // "which one am I?" 
     });
+    this.bats.forEach(b => { if (b.identT > 0) b.identT = Math.max(0, b.identT - dt); });
 
     // the night shift: a third watchman
     const w3 = this.watchmen[2];
     if (!w3.active && this.started && (this.activeBats().length >= 3 || p >= THIRD_WATCHMAN_AT)) {
       Object.assign(w3, { active: true, x: w3.path[0][0], z: w3.path[0][1], seg: 1, mode: 'patrol' });
+      this.bats.forEach(o => { if (o.state === 'active') o.invulnT = Math.max(o.invulnT, 2.5); }); // a fresh watchman never grabs a bat the moment he starts
       if (!this.shiftDone) { this.shiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A', 'lantern'); this.sound.play('alarm'); }
     }
 
@@ -1307,6 +1351,7 @@ export class Game {
     const w4 = this.watchmen[3];
     if (w4 && !w4.active && this.started && this.roundTime >= 240 && p >= FOURTH_WATCHMAN_AT) {
       Object.assign(w4, { active: true, x: w4.path[0][0], z: w4.path[0][1], seg: 1, mode: 'patrol' });
+      this.bats.forEach(o => { if (o.state === 'active') o.invulnT = Math.max(o.invulnT, 2.5); }); // a fresh watchman never grabs a bat the moment he starts
       if (!this.lateShiftDone) { this.lateShiftDone = true; this.showBanner(tr('nightShift'), 3, '#F07A6A', 'lantern'); this.sound.play('alarm'); }
     }
     this.updateWatchmen(dt, p, !this.started);
@@ -1603,16 +1648,57 @@ export class Game {
           b.wingR.rotation.z = -1.25; b.wingL.rotation.z = 1.25; if (b.eyes) b.eyes.visible = false;
           b.ring.material.opacity = .35; b.g.visible = true;
         } else {
-          b.g.position.set(b.x, FLY_Y + Math.sin(t * 3 + b.slot) * .12, b.z);
-          b.g.rotation.set(0, b.yaw, 0);
-          const flap = Math.sin(t * (b.carrying ? 20 : 15) + b.slot) * .75;
+          // carrying garlic = heavy: slower, deeper wing beats, flying lower, body heaving up on each
+          // downstroke and sagging between them, nose pulled up, a little wobble from side to side
+          // the wing phase is advanced frame by frame: changing the flap speed then never makes the wings jump
+          const vdt = Math.min(.1, Math.max(0, t - (b.visT ?? t))); b.visT = t;
+          b.heavy = lerp(b.heavy || 0, b.carrying ? 1 : 0, 1 - Math.exp(-vdt * 2.8)); const hv = b.heavy;
+          b.flapPh = (b.flapPh ?? b.slot) + vdt * lerp(15, 8.5, hv);
+          const ph = b.flapPh;
+          const light = Math.sin(t * 3 + b.slot) * .12, heave = Math.sin(ph - 1.3) * .17 - .38;
+          b.g.position.set(b.x, FLY_Y + lerp(light, heave, hv), b.z);
+          b.g.rotation.order = 'YXZ';
+          b.g.rotation.set(-.22 * hv + Math.sin(ph - 1.3) * .06 * hv, b.yaw, Math.sin(t * 2.1 + b.slot) * .1 * hv);
+          const flap = Math.sin(ph) * lerp(.75, 1.05, hv);
           b.wingR.rotation.z = flap; b.wingL.rotation.z = -flap; if (b.eyes) b.eyes.visible = true;
           b.ring.material.opacity = .85;
           b.g.visible = !(b.invulnT > 0 && Math.floor(t * 8) % 2 === 0); // blinks while it can't be caught
         }
       }
       if (b.rig) this.poseBat(b, t);
-      b.carry.visible = !!b.carrying && !b.carrying.golden; b.carryGold.visible = !!b.carrying && b.carrying.golden;
+      const hold = !!b.carrying && !sleeping;
+      b.carry.visible = hold;
+      if (hold) {
+        const gp = b.g.position, sw = Math.sin(t * 4 + b.slot) * .22;
+        // hangs under the bat and swings behind its wing beats, like a weight on a string
+        const lag = Math.sin((b.flapPh ?? t * 8.5) - 2.4);
+        b.carry.position.set(gp.x + Math.sin(sw) * .18, gp.y - .72 + lag * .05, gp.z + .42);
+        b.carry.rotation.set(lag * .12, 0, sw);
+        b.carry.userData.glow.quaternion.copy(this.camera.quaternion);
+        b.carry.userData.glow.material.opacity = .6 + Math.sin(t * 5) * .15;
+      }
+      // arrow to the fire while carrying (gone once the fire is right there)
+      const fdx = FURNACE.x - b.x, fdz = FURNACE.z - b.z, fd = Math.hypot(fdx, fdz);
+      const showArrow = hold && !caged && !carried && b.napT <= 0 && fd > 3.2;
+      b.fireArrow.visible = showArrow;
+      if (showArrow) {
+        b.fireArrow.position.set(b.x + fdx / fd * 2.05, .21, b.z + fdz / fd * 2.05);
+        b.fireArrow.rotation.y = Math.atan2(fdx, fdz) + Math.PI; // the shape points along -z before turning
+        b.fireArrow.material.opacity = .65 + Math.sin(t * 6) * .25;
+      }
+      // "that's me": beam + rings, fading out
+      const id = b.identT > 0 ? b.identT / IDENT_T : 0;
+      b.beam.visible = id > 0;
+      if (id > 0) {
+        const gp = b.g.position, fadeIn = Math.min(1, (IDENT_T - b.identT) / .15);
+        b.beam.position.set(gp.x, 3.5, gp.z); b.beam.material.opacity = .34 * Math.min(id * 2, 1) * fadeIn * (.85 + Math.sin(t * 14) * .15);
+      }
+      b.idRings.forEach((r, i) => {
+        const u = ((IDENT_T - b.identT) * 1.3 + i * .5) % 1;
+        r.visible = id > 0; if (!r.visible) return;
+        const gp = b.g.position; r.position.set(gp.x, .2, gp.z); r.scale.setScalar(.6 + u * 2.6); r.material.opacity = (1 - u) * .9 * Math.min(id * 2, 1);
+      });
+      b.tag.classList.toggle('ident', id > 0);
       // echolocation beacon over the closest garlic + sonar ripple at the bat
       if (b.echo && b.echo.spot) {
         const s = b.echo.spot, et = b.echo.t, fade = et > ECHO_DUR - .5 ? (ECHO_DUR - et) / .5 : Math.min(1, et / .2);
@@ -1639,24 +1725,35 @@ export class Game {
       const nm = out ? tr('tagOut', { name: b.name }) : sleeping ? tr('tagSleep', { name: b.name }) : b.name;
       if (cache.nm !== nm) { cache.nm = nm; b.tagNm.textContent = nm; b.tag.classList.toggle('sleep', sleeping); b.tag.classList.toggle('out', out); }
       if (cache.lives !== b.lives) { cache.lives = b.lives; b.tagHearts.forEach((hEl, i) => hEl.classList.toggle('lost', i >= b.lives)); }
-      const locked = !!b.carrying && !caged && !carried; // carrying garlic: echo is switched off (shown greyed)
-      const ready = !caged && !carried && !locked && b.echoCd <= 0 && b.wakeT <= 0 && b.napT <= 0, echoTxt = sleeping ? '' : caged || carried ? tr('tagCaged', { n: Math.max(0, Math.ceil(b.cageT)) }) : b.napT > 0 ? 'zzz' : ready || (locked && b.echoCd <= 0) ? tr('tagEchoReady') : tr('tagEcho', { n: Math.max(1, Math.ceil(Math.max(b.echoCd, b.wakeT))) });
-      if (cache.echo !== echoTxt || cache.locked !== locked || cache.ready !== ready) { cache.echo = echoTxt; cache.locked = locked; cache.ready = ready; b.tagEcho.hidden = sleeping; b.tagEchoTxt.textContent = echoTxt; b.tagEcho.classList.toggle('ready', ready); b.tagEcho.classList.toggle('locked', locked); }
-      if (!ready && !sleeping) b.tagEcho.style.setProperty('--p', (caged || carried ? 1 - b.cageT / CAGE_TIME : 1 - b.echoCd / ECHO_CD).toFixed(3));
-      const napping = b.napT > 0;
-      const gp = caged ? b.rescueT / RESCUE_TIME : carried ? 0 : napping ? 1 - b.napT / NAP_TIME : b.grabT > 0 ? b.grabT / GRAB_TIME : 0;
-      b.tagGrab.hidden = gp <= 0; b.tagGrab.classList.toggle('nap', napping); if (gp > 0) b.tagGrab.style.setProperty('--p', gp.toFixed(3));
-      const canPass = !sleeping && !napping && !!b.carrying && !!this.passTarget(b);
-      if (cache.pass !== canPass) { cache.pass = canPass; b.tagPass.hidden = !canPass; }
+      // the bubble under the name says, in pictures, what pressing a button does right now:
+      //   echo icon (find garlic) · pass icon (a friend is close) · flame (bring it to the fire) · zzz · cage + seconds
+      const napping = b.napT > 0, canPass = !sleeping && !napping && !!b.carrying && !!this.passTarget(b);
+      const cooling = !b.carrying && (b.echoCd > 0 || b.wakeT > 0);
+      const mode = sleeping ? 'none' : caged || carried ? 'cage' : napping ? 'nap' : canPass ? 'pass' : b.carrying ? 'fire' : cooling ? 'cool' : 'echo';
+      const num = mode === 'cage' ? String(Math.max(0, Math.ceil(b.cageT))) : '';
+      if (cache.mode !== mode || cache.num !== num) {
+        if (cache.mode !== mode) {
+          b.tagAic.innerHTML = { echo: ICONS.echo, pass: ICONS.pass, fire: ICONS.flame, nap: ICONS.zzz, cage: ICONS.cage, cool: ICONS.echo, none: '' }[mode];
+          b.tagEcho.className = 'echo m-' + mode; b.tagEcho.hidden = mode === 'none';
+        }
+        cache.mode = mode; cache.num = num; b.tagEchoTxt.textContent = num;
+      }
+      if (mode === 'cool') b.tagEcho.style.setProperty('--p', (1 - Math.max(b.echoCd / ECHO_CD, b.wakeT / .8)).toFixed(3));
+      else if (mode === 'cage') b.tagEcho.style.setProperty('--p', (1 - b.cageT / CAGE_TIME).toFixed(3));
+      const gp = caged ? b.rescueT / RESCUE_TIME : carried ? 0 : b.grabT > 0 ? b.grabT / GRAB_TIME : 0;
+      b.tagGrab.hidden = gp <= 0; if (gp > 0) b.tagGrab.style.setProperty('--p', gp.toFixed(3));
     });
 
     // the jail: a mint ring at the door shows where to fly to break your friends out
     if (this.jail) {
       const J = this.jail, n = this.bats.filter(b => b.state === 'caged').length;
       J.ring.visible = J.glow.visible = n > 0 && this.state === 'play';
+      const inJail = this.bats.some(b => b.state === 'caged' || b.state === 'carried') && this.state === 'play';
+      J.outline.visible = inJail;
+      if (inJail) { const pl = .75 + Math.sin(t * 3.2) * .25; J.outMats[0].opacity = .95 * pl; J.outMats[1].opacity = .38 * pl; J.outMats[2].opacity = .45 * pl; }
       if (n > 0) { const pulse = Math.sin(t * 5); J.ring.material.opacity = .55 + pulse * .3; J.ring.scale.setScalar(1 + pulse * .03); J.glow.material.opacity = .25 + J.rescueT / RESCUE_TIME * .5; }
-      J.tag.hidden = !(n > 0 && this.state === 'play');
-      if (n > 0) {
+      J.tag.hidden = !(n > 0 && this.state === 'play' && J.rescueT > 0); // only while a friend is breaking them out: the caged bat's own tag already shows its timer
+      if (!J.tag.hidden) {
         const [sx, sy] = this.toScreen(J.x, 2.9, J.z);
         J.tag.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
         J.tag.style.setProperty('--p', (J.rescueT / RESCUE_TIME).toFixed(3)); J.tag.classList.toggle('helping', !!J.rescuing);
@@ -1714,7 +1811,7 @@ export class Game {
       tutorial: this.tutorial ? { step: this.tutorial.step, t: this.tutorial.t } : null, jailed: this.bats.filter(b => b.state === 'caged').length, clapping: this.clapFlash > 0, mic: this.clapper.status, clapLeft: Math.max(0, CLAP_MAX - this.clapBoost), total: this.remaining() + this.burned,
       count: this.state === 'countdown' ? Math.max(1, Math.ceil(this.cdT)) : 0,
       awake: this.bats.filter(b => b.state === 'active' || b.state === 'caged' || b.state === 'carried').length,
-      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active' || b.state === 'caged' || b.state === 'carried', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, napping: b.napT > 0, caged: b.state === 'caged' || b.state === 'carried', cageLeft: Math.max(0, Math.ceil(b.cageT)), echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0, echoLocked: !!b.carrying })),
+      players: this.bats.filter(b => b.state !== 'sleep' || b.slot < 3 || this.padConnected(b.slot - 3)).map(b => ({ slot: b.slot, name: b.name, color: b.color, awake: b.state === 'active' || b.state === 'caged' || b.state === 'carried', out: b.state === 'out', lives: b.lives, carrying: !!b.carrying, napping: b.napT > 0, lost: b.slot >= 3 && b.state === 'active' && (!this.padState || !this.padState[b.slot - 3] || !!this.padState[b.slot - 3].lost), caged: b.state === 'caged' || b.state === 'carried', cageLeft: Math.max(0, Math.ceil(b.cageT)), echo: b.echoCd > 0 ? Math.ceil(b.echoCd) : 0, echoLocked: !!b.carrying })),
       backend: this.backend
     };
   }

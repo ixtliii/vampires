@@ -115,3 +115,5 @@ export const TREES = [[-21.4, -10.2], [-21.4, 10.2], // only along the edges of 
 export const GRAVEYARD = { x: 1.6, z: -7.0, w: 3.2, d: 2.2 };
 export const FIELDS = [{ x: -9, z: -10.2, w: 4, d: 1.0 }, { x: -14.5, z: 10.25, w: 3.4, d: .9 }, { x: 0.8, z: 10.25, w: 3.2, d: .9 }]; // little garlic-free vegetable patches at the edge
 export const STALLS = [{ x: -0.9, z: -1.95, color: '#F07A6A' }, { x: -3.1, z: 1.95, color: '#7FD6E0' }];
+
+export const IDENT_T = 2.4; // seconds a bat lights up after its Joy-Con is shaken

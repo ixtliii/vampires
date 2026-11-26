@@ -407,3 +407,62 @@ kbd{background:linear-gradient(180deg,#5B4A92,#3A2D66);border:0;border-radius:7p
 .clap-jail .ic svg{width:100%;height:100%}
 @keyframes clapJail{50%{box-shadow:inset 0 0 0 3px #F5D66B,inset 0 0 0 6px var(--st-deep),0 4px 0 var(--st-deep),0 0 30px rgba(245,214,107,.6)}}
 @media (prefers-reduced-motion: reduce){.clap-jail{animation:none}}
+.pc-id:has(.pc-flip){white-space:normal;overflow:visible}
+.pc-flip{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pc-flip button{padding:4px 10px;font-size:13px;min-height:0}
+.pc-flip button.on{background:#F5D66B;color:#2A1E4A;border-color:#F5D66B}
+.chip .ec.lost{background:linear-gradient(180deg,#F07A6A,#C24E4E);color:#fff;animation:lostPulse 1s ease-in-out infinite}
+@keyframes lostPulse{50%{opacity:.55}}
+
+/* ---- bat tag: name + hearts on one line, then one icon bubble = "what your button does now" ---- */
+.tag{gap:4px}
+.tag .row{display:flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:rgba(14,11,32,.55)}
+.tag .row .nm{font:700 14px/1 var(--display)}
+.tag .hearts{font-size:12px}
+.tag .echo{gap:4px;padding:3px;border-radius:999px;background:rgba(14,11,32,.8);box-shadow:0 0 0 2px #1B1438;animation:none}
+.tag .echo .aic{display:block;width:26px;height:26px}
+.tag .echo .aic svg{width:100%;height:100%;display:block}
+.tag .echo i{display:none}
+.tag .echo em{display:none;font:700 14px/1 var(--display);padding-right:6px;color:#fff}
+/* the little "press a button" dot */
+.tag .echo .btn{display:none;width:18px;height:18px;border-radius:50%;margin-left:2px;background:radial-gradient(circle at 45% 40%,#fff 0 3px,#3A2D66 4px);box-shadow:0 0 0 2px #fff}
+.tag .echo.m-echo .btn,.tag .echo.m-pass .btn{display:block}
+.tag .echo.m-echo{background:linear-gradient(180deg,#9EF0FF,#2FB8D6);animation:readyGlow 1.4s ease-in-out infinite}
+.tag .echo.m-pass{background:linear-gradient(180deg,#C9FFE9,#5FD3A8);animation:passGlow .9s ease-in-out infinite}
+.tag .echo.m-fire{background:linear-gradient(180deg,#FFD08A,#F08A3A);box-shadow:0 0 0 2px #1B1438,0 0 14px rgba(255,170,80,.7)}
+.tag .echo.m-cool{background:conic-gradient(rgba(127,214,224,.85) calc(var(--p,0)*1turn), rgba(14,11,32,.8) 0);opacity:.75}
+.tag .echo.m-cool .aic{opacity:.45;filter:grayscale(1)}
+.tag .echo.m-nap{opacity:.85}
+.tag .echo.m-cage{background:linear-gradient(180deg,#8A7AB8,#5D4A9E)}
+.tag .echo.m-cage em{display:block}
+@keyframes readyGlow{50%{box-shadow:0 0 0 2px #1B1438,0 0 16px #7FE3F5}}
+@keyframes passGlow{50%{box-shadow:0 0 0 2px #1B1438,0 0 18px #9FE0C9}}
+@media (prefers-reduced-motion: reduce){.tag .echo.m-echo,.tag .echo.m-pass{animation:none}}
+.tag .passhint{display:none!important}
+/* shaken: "that's me!" */
+.tag.ident .row{background:rgba(14,11,32,.85);box-shadow:0 0 0 3px currentColor,0 0 20px rgba(255,255,255,.55)}
+.tag.ident .row .nm{font-size:20px}
+
+/* ---- bottom chips: icons instead of words ---- */
+.chip .st{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;background:linear-gradient(180deg,#5B4A92,#3A2D66);font:700 13px/1 var(--display);color:#fff}
+.chip .st .ic{width:20px;height:20px;display:block}
+.chip .st .ic svg{width:100%;height:100%;display:block}
+.chip .st.ready{background:linear-gradient(180deg,#9EF0FF,#2FB8D6)}
+.chip .st.garlic{background:linear-gradient(180deg,#FFF6DC,#E6D6B0)}
+.chip .st.cool .ic{opacity:.5;filter:grayscale(1)}
+
+/* the clap notice sits under the timer, out of the way of the village */
+.clap-jail{right:auto;left:50%;bottom:auto;top:78px;transform:translateX(-50%);font-size:15px;padding:6px 12px 6px 6px;max-width:none;white-space:nowrap}
+.clap-jail .ic{width:26px;height:26px}
+/* round icon badges (no "button dot"): dark inside so the coloured icon reads, coloured ring = state */
+.tag .echo .btn{display:none!important}
+.tag .echo{width:38px;height:38px;padding:5px;box-sizing:border-box;justify-content:center;border-radius:50%}
+.tag .echo .aic{width:28px;height:28px}
+.tag .echo.m-echo{background:#1B1438;box-shadow:0 0 0 3px #7FE3F5,0 0 12px rgba(127,227,245,.6)}
+.tag .echo.m-pass{background:#1B1438;box-shadow:0 0 0 3px #9FE0C9,0 0 12px rgba(159,224,201,.6)}
+.tag .echo.m-fire{background:#1B1438;box-shadow:0 0 0 3px #FFB347,0 0 12px rgba(255,170,80,.6)}
+.tag .echo.m-cool{background:conic-gradient(rgba(127,214,224,.8) calc(var(--p,0)*1turn), rgba(14,11,32,.85) 0);box-shadow:0 0 0 2px #1B1438}
+.tag .echo.m-cage{width:auto;border-radius:999px;padding:4px 8px 4px 5px;gap:3px}
+@keyframes readyGlow{50%{box-shadow:0 0 0 3px #7FE3F5,0 0 22px rgba(127,227,245,.9)}}
+@keyframes passGlow{50%{box-shadow:0 0 0 3px #9FE0C9,0 0 22px rgba(159,224,201,.9)}}
+.chip .st.ready{background:#1B1438;box-shadow:0 0 0 2px #7FE3F5}

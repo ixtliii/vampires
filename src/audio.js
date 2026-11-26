@@ -9,7 +9,7 @@ const MEL = [[69, null, 72, 69, 76, null, 74, 72, 71, null, 68, 71, 64, null, nu
 const BASS = [[45, 45, 40, 40, 45, 45, 40, 40], [45, 45, 41, 41, 40, 40, 45, 45]];
 
 export class Sound {
-  constructor() { this.ac = null; this.on = true; this.music = false; this.step = 0; this.next = 0; this.tempo = 0; }
+  constructor() { this.ac = null; this.on = true; this.music = false; this.step = 0; this.next = 0; this.tempo = 0; this.ambT = {}; }
   init() {
     if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
     try {
@@ -20,6 +20,9 @@ export class Sound {
       this.sg = ac.createGain(); this.sg.gain.value = 0.75; this.sg.connect(this.master);
       this.nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
       const d = this.nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      // village ambience: its own quiet bus, under the music
+      this.ag = ac.createGain(); this.ag.gain.value = 0.55; this.ag.connect(this.master);
+      this.startWind();
       setInterval(() => this.schedule(), 25);
     } catch (e) { this.ac = null; }
   }
@@ -39,6 +42,46 @@ export class Sound {
     f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     s.connect(f); f.connect(g); g.connect(dest || this.sg); s.start(t); s.stop(t + dur + 0.05);
+  }
+  // ---- village at night -------------------------------------------------------------------------
+  // a soft, endless wind: looping noise through a low filter whose cutoff drifts slowly
+  startWind() {
+    const ac = this.ac, len = ac.sampleRate * 4, b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0);
+    let last = 0; for (let i = 0; i < len; i++) { last = last * .985 + (Math.random() * 2 - 1) * .015; d[i] = last * 6; } // brown-ish noise
+    const src = ac.createBufferSource(); src.buffer = b; src.loop = true;
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 380; f.Q.value = .7;
+    const g = ac.createGain(); g.gain.value = .16;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = .07; lg.gain.value = 160; lfo.connect(lg); lg.connect(f.frequency); lfo.start();
+    const lfo2 = ac.createOscillator(), lg2 = ac.createGain(); lfo2.frequency.value = .045; lg2.gain.value = .07; lfo2.connect(lg2); lg2.connect(g.gain); lfo2.start();
+    src.connect(f); f.connect(g); g.connect(this.ag); src.start();
+  }
+  // a sound placed somewhere left or right in the room
+  pan(x) { const p = this.ac.createStereoPanner ? this.ac.createStereoPanner() : null; if (!p) return this.ag; p.pan.value = x; p.connect(this.ag); return p; }
+  cricket(t) {
+    const dest = this.pan(Math.random() * 1.6 - .8), f = 4200 + Math.random() * 900, n = 2 + Math.floor(Math.random() * 3);
+    for (let k = 0; k < 2; k++) for (let i = 0; i < n; i++) this.tone(f, .035, 'sine', .03, t + k * .32 + i * .055, null, dest);
+  }
+  owl(t) {
+    const dest = this.pan(Math.random() < .5 ? -.6 : .6);
+    this.tone(400, .32, 'sine', .07, t, 370, dest); this.tone(410, .22, 'sine', .05, t + .45, 390, dest); this.tone(405, .55, 'sine', .07, t + .75, 350, dest);
+  }
+  dog(t) {
+    const dest = this.pan(Math.random() * 1.4 - .7);
+    [0, .28].forEach(d => { this.tone(520, .12, 'sawtooth', .025, t + d, 300, dest); this.noise(.1, 900, 500, .03, 2, t + d, dest); });
+  }
+  frog(t) { const dest = this.pan(Math.random() * 1.2 - .6); [0, .16].forEach(d => this.tone(140, .12, 'square', .02, t + d, 95, dest)); }
+  bell(t) { const dest = this.pan(-.3); [1, 2.76, 5.4].forEach((m, i) => this.tone(196 * m, 3.2 / (i + 1), 'sine', .035 / (i + 1), t, null, dest)); }
+  crackle(t) { const dest = this.pan(.75); for (let i = 0; i < 3; i++) this.noise(.03, 2500 + Math.random() * 2500, 1800, .05, 3, t + Math.random() * .3, dest); }
+  ambience() {
+    const t = this.ac.currentTime, A = this.ambT;
+    const due = (k, lo, hi, fn) => { if (A[k] === undefined) A[k] = t + lo * Math.random(); if (t >= A[k]) { fn(t + .02); A[k] = t + lo + Math.random() * (hi - lo); } };
+    due('cricket', .6, 2.2, x => this.cricket(x));
+    due('cricket2', 1.1, 3.4, x => this.cricket(x));
+    due('frog', 6, 14, x => this.frog(x));
+    due('owl', 16, 34, x => this.owl(x));
+    due('dog', 35, 70, x => this.dog(x));
+    due('bell', 70, 110, x => this.bell(x));
+    due('crackle', .8, 2.5, x => this.crackle(x));
   }
   play(name) {
     if (!this.ac) return; const t = this.now();
@@ -79,7 +122,9 @@ export class Sound {
     }
   }
   schedule() {
-    if (!this.ac || !this.music) return;
+    if (!this.ac) return;
+    if (this.on) this.ambience();
+    if (!this.music) return;
     const ac = this.ac, eighth = 60 / (104 + 60 * this.tempo) / 2;
     if (this.next < ac.currentTime) this.next = ac.currentTime + .05;
     while (this.next < ac.currentTime + .15) {
